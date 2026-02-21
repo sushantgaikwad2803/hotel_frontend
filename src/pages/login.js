@@ -55,7 +55,7 @@ function Login({ hotelName = "Grand Horizon Hotel" }) {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        const response = await fetch('http://localhost:1000/api/hotel/login', {
+        const response = await fetch('https://hotel-backend-dm5h.onrender.com/api/hotel/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
@@ -80,9 +80,9 @@ function Login({ hotelName = "Grand Horizon Hotel" }) {
     }
   };
 
-  const handleGuestLogin = () => {
-    alert(`Continuing as guest at ${hotelName}`);
-  };
+  // const handleGuestLogin = () => {
+  //   alert(`Continuing as guest at ${hotelName}`);
+  // };
 
   const handleForgotPassword = (e) => {
     e.preventDefault();
@@ -90,10 +90,10 @@ function Login({ hotelName = "Grand Horizon Hotel" }) {
   };
 
   // Update this function to show coming soon popup
-  const handleSignUp = (e) => {
-    e.preventDefault();
-    setShowComingSoon(true);
-  };
+  // const handleSignUp = (e) => {
+  //   e.preventDefault();
+  //   setShowComingSoon(true);
+  // };
 
   // Close coming soon modal
   const closeComingSoon = () => {

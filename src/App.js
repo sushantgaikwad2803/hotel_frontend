@@ -5,8 +5,8 @@ import Signup from './pages/signup';
 import './App.css';
 import Home from './pages/admin';
 import Menu from './pages/Menu';
-import BookingPage from "./pages/BookingPage";
 import GenerateQR from "./pages/GenerateQR";
+import Booking from "./pages/BookingsPage";
 
 
 
@@ -21,8 +21,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin" element={<Home />} />
         <Route path="/menu/:hotelId/:tableNumber" element={<Menu />} />
-        <Route path="/booking" element={<BookingPage />} />
         <Route path="/generate-qr" element={<GenerateQR />} />
+        <Route path="/booking" element={<Booking />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Utensils, LogOut, Edit, Trash2, Plus, X,
-  Star, Clock, ChevronLeft, Camera, Check
+  Clock, Camera, Check
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './admin.css';
@@ -66,8 +66,9 @@ function AdminDashboard() {
       const data = await response.json();
 
       if (data.success) {
-        setFoods(data.foods);
+        setFoods(data.data || []);
       }
+      
     } catch (error) {
       console.error("Error fetching foods:", error);
     }
@@ -278,10 +279,6 @@ function AdminDashboard() {
       {/* Header */}
       <div className="dashboard-header">
         <div className="header-left">
-          <button className="back-button" onClick={() => navigate('/admin')}>
-            <ChevronLeft size={20} />
-            Back
-          </button>
           <Utensils size={24} color="#e67e22" />
           <h1>{hotel.hotelName} Portal</h1>
         </div>
@@ -310,7 +307,6 @@ function AdminDashboard() {
             <div className="hotel-info">
               <div className="hotel-name-section">
                 <h2>{hotel.hotelName}</h2>
-                <span className="hotel-status-badge">Active</span>
               </div>
 
               <div className="hotel-details-grid">
@@ -385,7 +381,7 @@ function AdminDashboard() {
 
         <button
           className="booking-page-btn"
-          onClick={() => navigate("/bookings")}
+          onClick={() => navigate("/booking")}
         >
           View Booked Tables
         </button>
@@ -473,19 +469,11 @@ function AdminDashboard() {
                         <Clock size={14} />
                         {food.preparationTime || '15-20 mins'}
                       </div>
-                      <div className={`food-spice ${food.spiceLevel}`}>
-                        {food.spiceLevel === 'mild' && '🌶️ Mild'}
-                        {food.spiceLevel === 'medium' && '🌶️🌶️ Medium'}
-                        {food.spiceLevel === 'hot' && '🌶️🌶️🌶️ Hot'}
+                      <div className={`food-spice ${food.starters}`}>
+                        {food.starters === 'starters' && 'Starters'}
+                        {food.starters === 'non-starters' && 'Non-Starters'}
                       </div>
                     </div>
-
-                    {food.rating > 0 && (
-                      <div className="food-rating">
-                        <Star size={14} fill="#ffc107" color="#ffc107" />
-                        <span>{food.rating}</span>
-                      </div>
-                    )}
 
                     <div className="food-item-actions">
 
@@ -698,14 +686,13 @@ function AdminDashboard() {
                 </div>
 
                 <div className="form-group">
-                  <label>Spice Level</label>
+                  <label>Starters</label>
                   <select
                     value={foodForm.spiceLevel}
                     onChange={(e) => setFoodForm({ ...foodForm, spiceLevel: e.target.value })}
                   >
-                    <option value="mild">Mild</option>
-                    <option value="medium">Medium</option>
-                    <option value="hot">Hot</option>
+                    <option value="mild">Starters</option>
+                    <option value="medium">Non-Starters</option>
                   </select>
                 </div>
               </div>
