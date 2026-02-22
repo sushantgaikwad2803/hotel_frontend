@@ -11,7 +11,7 @@ function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [deliveredItems, setDeliveredItems] = useState({});
+  // const [ ] = useState({});
 
   /* ==============================
      LOAD HOTEL
@@ -36,14 +36,17 @@ function BookingsPage() {
   ============================== */
   const fetchBookings = useCallback(async () => {
     if (!hotel?._id) return;
-
+  
     try {
       const res = await fetch(`${API}/api/bookings/${hotel._id}`);
       const data = await res.json();
-
+  
       if (data.success) {
-        setBookings(data.data);
-        setError("");
+        const sortedBookings = data.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      
+        setBookings(sortedBookings);
       } else {
         setError("Failed to load bookings.");
       }
@@ -116,13 +119,25 @@ function BookingsPage() {
   /* ==============================
      MARK AS DELIVERED (UI ONLY)
   ============================== */
-  const markAsDelivered = (bookingId, foodId) => {
-    const key = `${bookingId}-${foodId}`;
-
-    setDeliveredItems((prev) => ({
-      ...prev,
-      [key]: true,
-    }));
+  const markAsDelivered = async (bookingId, foodId) => {
+    try {
+      const res = await fetch(
+        `${API}/api/bookings/deliver-item/${bookingId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ foodId }),
+        }
+      );
+  
+      const data = await res.json();
+  
+      if (data.success) {
+        updateBookingState(bookingId, data.data);
+      }
+    } catch (err) {
+      console.error("Deliver error:", err);
+    }
   };
 
   /* ==============================
@@ -202,7 +217,7 @@ function BookingsPage() {
                     {tableBookings.map((booking) =>
                       booking.orders.map((item) => {
                         const key = `${booking._id}-${item.foodId}`;
-                        const isDelivered = deliveredItems[key];
+                        const isDelivered = item.delivered;
 
                         return (
                           <div key={key} className="order-row">
