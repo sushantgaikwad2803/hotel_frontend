@@ -142,7 +142,7 @@ import "./generateqr.css";
 function GenerateQR() {
   const navigate = useNavigate();
 
-  const API = "https://hotel-backend-dm5h.onrender.com";
+  // const API = "https://hotel-backend-dm5h.onrender.com";
   const FRONTEND_URL = window.location.origin; 
   // Automatically uses deployed domain instead of localhost
 
