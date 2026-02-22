@@ -8,15 +8,18 @@ import './admin.css';
 
 function AdminDashboard() {
   const navigate = useNavigate();
+
+  // ✅ CENTRAL BACKEND
+  const API = "https://hotel-backend-dm5h.onrender.com";
+  const API_URL = `${API}/api/food`;
+  const HOTEL_API = `${API}/api/hotel`;
+
   const [hotel, setHotel] = useState(null);
   const [foods, setFoods] = useState([]);
   const [showFoodModal, setShowFoodModal] = useState(false);
   const [showEditHotelModal, setShowEditHotelModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_URL = "https://hotel-backend-dm5h.onrender.com/api/food";
-
-  // Food form state
   const [foodForm, setFoodForm] = useState({
     id: '',
     name: '',
@@ -25,14 +28,12 @@ function AdminDashboard() {
     description: '',
     image: '',
     isAvailable: true,
-    // preparationTime: '15-20 mins',
     spiceLevel: 'medium'
   });
 
   const [foodImagePreview, setFoodImagePreview] = useState(null);
   const [editingFood, setEditingFood] = useState(null);
 
-  // Hotel edit form state
   const [hotelForm, setHotelForm] = useState({
     hotelName: '',
     email: '',
@@ -41,8 +42,10 @@ function AdminDashboard() {
     state: '',
     hotelImage: ''
   });
+
   const [hotelImagePreview, setHotelImagePreview] = useState(null);
 
+  // 🔐 Auth Check
   useEffect(() => {
     const savedUser = localStorage.getItem("hotelUser");
 
@@ -54,46 +57,39 @@ function AdminDashboard() {
     }
   }, [navigate]);
 
-  // 1️⃣ Define fetchFoods FIRST
+  // 📥 Fetch Foods
   const fetchFoods = useCallback(async () => {
     if (!hotel?._id) return;
 
     try {
-      const response = await fetch(
-        `https://hotel-backend-dm5h.onrender.com/api/food/hotel/${hotel._id}`
-      );
-
+      const response = await fetch(`${API_URL}/hotel/${hotel._id}`);
       const data = await response.json();
 
       if (data.success) {
         setFoods(data.data || []);
       }
-      
     } catch (error) {
       console.error("Error fetching foods:", error);
     }
-  }, [hotel]);
+  }, [hotel, API_URL]);
 
-  // 2️⃣ Then use it inside useEffect
   useEffect(() => {
     fetchFoods();
   }, [fetchFoods]);
-
-
 
   const handleLogout = () => {
     localStorage.removeItem('hotelUser');
     navigate('/login');
   };
 
-  // Hotel Update
+  // 🏨 Update Hotel
   const handleHotelUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://hotel-backend-dm5h.onrender.com/api/hotel/${hotel._id}`, {
+      const response = await fetch(`${HOTEL_API}/${hotel._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(hotelForm), // Sending address, city, state to DB
+        body: JSON.stringify(hotelForm),
       });
 
       const result = await response.json();
@@ -110,23 +106,24 @@ function AdminDashboard() {
 
   const handleHotelImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Image size should be less than 5MB');
-        return;
-      }
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setHotelImagePreview(reader.result);
-        setHotelForm(prev => ({ ...prev, hotelImage: reader.result }));
-      };
-      reader.readAsDataURL(file);
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setHotelImagePreview(reader.result);
+      setHotelForm(prev => ({ ...prev, hotelImage: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleFoodImageUpload = (e) => {
@@ -159,8 +156,6 @@ function AdminDashboard() {
     try {
       const formData = new FormData();
 
-      console.log("SENDING HOTEL ID:", hotel._id); // 🔥 ADD THIS
-
       formData.append("hotelId", hotel._id);
       formData.append("title", foodForm.name);
       formData.append("desc", foodForm.description);
@@ -180,7 +175,6 @@ function AdminDashboard() {
       if (response.ok) {
         alert(editingFood ? "Food updated!" : "Food added!");
 
-        // ✅ RESET FORM COMPLETELY
         setFoodForm({
           id: '',
           name: '',
@@ -197,8 +191,7 @@ function AdminDashboard() {
         setShowFoodModal(false);
 
         fetchFoods();
-      }
-      else {
+      } else {
         const errData = await response.json();
         alert(errData.message || "Operation failed");
       }
@@ -209,11 +202,14 @@ function AdminDashboard() {
     }
   };
 
-
   const handleDeleteFood = async (foodId) => {
     if (!window.confirm("Delete this item?")) return;
+
     try {
-      const response = await fetch(`${API_URL}/${foodId}`, { method: "DELETE" });
+      const response = await fetch(`${API_URL}/${foodId}`, {
+        method: "DELETE"
+      });
+
       if (response.ok) {
         setFoods(foods.filter(f => f._id !== foodId));
       }
@@ -228,15 +224,12 @@ function AdminDashboard() {
 
       const response = await fetch(`${API_URL}/${food._id}/toggle`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Update state
         setFoods(prevFoods =>
           prevFoods.map(f => (f._id === food._id ? result.data : f))
         );
@@ -244,12 +237,9 @@ function AdminDashboard() {
         alert(result.message || "Failed to toggle availability");
       }
     } catch (error) {
-      console.error(error);
       alert("Server error while toggling availability");
     }
   };
-
-
 
   const handleEditFood = (food) => {
     setEditingFood(food);
@@ -259,14 +249,12 @@ function AdminDashboard() {
       price: food.price,
       description: food.desc,
       isAvailable: food.available,
-      preparationTime: food.preparationTime || '15-20 mins',
       spiceLevel: food.spiceLevel || 'medium'
     });
     setFoodImagePreview(food.image);
     setShowFoodModal(true);
   };
 
-  // Statistics
   const totalFoods = foods.length;
   const availableFoods = foods.filter(f => f.available).length;
   const vegCount = foods.filter(f => f.category === 'veg').length;
@@ -441,7 +429,7 @@ function AdminDashboard() {
                       src={
                         food.image?.startsWith("http")
                           ? food.image
-                          : `https://hotel-backend-dm5h.onrender.com/${food.image}`
+                          : `${API}/${food.image}`
                       }
                       alt={food.title || food.name}
                     />
