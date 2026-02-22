@@ -10,7 +10,7 @@ function AdminDashboard() {
   const navigate = useNavigate();
 
   // ✅ CENTRAL BACKEND
-  const API = "https://hotel-backend-dm5h.onrender.com";
+  const API = process.env.REACT_APP_API;
   const API_URL = `${API}/api/food`;
   const HOTEL_API = `${API}/api/hotel`;
 
@@ -24,11 +24,11 @@ function AdminDashboard() {
     id: '',
     name: '',
     category: 'veg',
+    foodCategory: 'food',
     price: '',
     description: '',
     image: '',
-    isAvailable: true,
-    spiceLevel: 'medium'
+    isAvailable: true
   });
 
   const [foodImagePreview, setFoodImagePreview] = useState(null);
@@ -161,6 +161,7 @@ function AdminDashboard() {
       formData.append("desc", foodForm.description);
       formData.append("price", foodForm.price);
       formData.append("category", foodForm.category);
+      formData.append("foodCategory", foodForm.foodCategory);
       formData.append("available", foodForm.isAvailable);
 
       if (foodForm.image) {
@@ -179,11 +180,11 @@ function AdminDashboard() {
           id: '',
           name: '',
           category: 'veg',
+          foodCategory: 'food',
           price: '',
           description: '',
           image: '',
-          isAvailable: true,
-          spiceLevel: 'medium'
+          isAvailable: true
         });
 
         setFoodImagePreview(null);
@@ -243,14 +244,17 @@ function AdminDashboard() {
 
   const handleEditFood = (food) => {
     setEditingFood(food);
+
     setFoodForm({
       name: food.title,
       category: food.category,
+      foodCategory: food.foodCategory,
       price: food.price,
       description: food.desc,
-      isAvailable: food.available,
-      spiceLevel: food.spiceLevel || 'medium'
+      image: '',
+      isAvailable: food.available
     });
+
     setFoodImagePreview(food.image);
     setShowFoodModal(true);
   };
@@ -406,11 +410,11 @@ function AdminDashboard() {
                   id: '',
                   name: '',
                   category: 'veg',
+                  foodCategory: 'food',
                   price: '',
                   description: '',
                   image: '',
-                  isAvailable: true,
-                  spiceLevel: 'medium'
+                  isAvailable: true
                 });
                 setFoodImagePreview(null);
                 setShowFoodModal(true);
@@ -457,9 +461,8 @@ function AdminDashboard() {
                         <Clock size={14} />
                         {food.preparationTime || '15-20 mins'}
                       </div>
-                      <div className={`food-spice ${food.starters}`}>
-                        {food.starters === 'starters' && 'Starters'}
-                        {food.starters === 'non-starters' && 'Non-Starters'}
+                      <div className="food-type-badge">
+                        {food.foodCategory?.toUpperCase()}
                       </div>
                     </div>
 
@@ -674,13 +677,19 @@ function AdminDashboard() {
                 </div>
 
                 <div className="form-group">
-                  <label>Starters</label>
+                  <label>Food Category </label>
                   <select
-                    value={foodForm.spiceLevel}
-                    onChange={(e) => setFoodForm({ ...foodForm, spiceLevel: e.target.value })}
+                    value={foodForm.foodCategory}
+                    onChange={(e) =>
+                      setFoodForm({ ...foodForm, foodCategory: e.target.value })
+                    }
+                    required
                   >
-                    <option value="mild">Starters</option>
-                    <option value="medium">Non-Starters</option>
+                    <option value="food">Food</option>
+                    <option value="rice">Rice</option>
+                    <option value="roti">Roti</option>
+                    <option value="starter">Starter</option>
+                    <option value="drinks">Drinks</option>
                   </select>
                 </div>
               </div>

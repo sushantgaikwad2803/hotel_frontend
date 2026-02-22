@@ -7,7 +7,7 @@ function Login() {
   const navigate = useNavigate();
 
   // ✅ CENTRAL BACKEND
-  const API = "https://hotel-backend-dm5h.onrender.com";
+  const API = process.env.REACT_APP_API;
 
   const [formData, setFormData] = useState({
     email: '',

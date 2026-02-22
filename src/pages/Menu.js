@@ -10,7 +10,7 @@ import {
 import { useParams } from "react-router-dom";
 import "./MenuPage.css";
 
-const API = "https://hotel-backend-dm5h.onrender.com";
+const API = process.env.REACT_APP_API;
 
 function MenuPage() {
   const { hotelId, tableNumber } = useParams();

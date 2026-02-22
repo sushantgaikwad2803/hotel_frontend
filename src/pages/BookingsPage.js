@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./bookings.css";
 
-const API = "https://hotel-backend-dm5h.onrender.com";
+const API = process.env.REACT_APP_API;
 
 function BookingsPage() {
   const navigate = useNavigate();

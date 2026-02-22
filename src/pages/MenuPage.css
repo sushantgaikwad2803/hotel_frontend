@@ -952,3 +952,24 @@ body {
 
 @keyframes fadein { from {opacity:0} to {opacity:1} }
 @keyframes fadeout { from {opacity:1} to {opacity:0} }
+
+.section-title {
+  margin: 25px 0 10px;
+  padding-left: 10px;
+}
+
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.food-card {
+  min-width: 180px;
+  flex-shrink: 0;
+}
