@@ -21,7 +21,7 @@ function Signup() {
     address: "",
     city: "",
     state: "",
-    tableCount: 1,
+    tableCount: "",
     hotelImage: null,
   });
 
