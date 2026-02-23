@@ -41,6 +41,14 @@ body {
   line-height: 1.5;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; 
+  overflow-y:auto/* Prevent body scroll, let dashboard handle it */
+}
+
 /* Loading State */
 .loading {
   display: flex;
@@ -1045,23 +1053,4 @@ input:checked + .toggle-slider:before {
   .btn-save {
     width: 100%;
   }
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-light);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary-light);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
 }
