@@ -35,6 +35,14 @@
     color: var(--text-dark);
     line-height: 1.5;
   }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; 
+    overflow-y:auto/* Prevent body scroll, let dashboard handle it */
+  }
   
   /* Main Container */
   .generate-qr-container {
