@@ -113,34 +113,49 @@ body {
   min-width: 250px;
 }
 
-.search-container select {
-  flex: 1;
-  padding: 14px;
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--border);
-  font-size: 14px;
-  font-weight: 500;
-  background: var(--white);
-  cursor: pointer;
-  transition: var(--transition);
-  min-width: 120px;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 40px;
-}
-
-.search-container input:hover,
-.search-container select:hover {
+.search-container input:hover {
   border-color: var(--primary-light);
 }
 
-.search-container input:focus,
-.search-container select:focus {
+.search-container input:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(255, 77, 47, 0.1);
+}
+
+/* ================= VEG FILTER BUTTONS ================= */
+.veg-filter {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  background: var(--white);
+  padding: 10px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.veg-filter button {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--gray-dark);
+}
+
+.veg-filter button.active {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
+.veg-filter button:hover:not(.active) {
+  border-color: var(--primary-light);
+  background: var(--gray-light);
 }
 
 /* ================= SECTION TITLES ================= */
@@ -173,9 +188,9 @@ body {
   padding: 5px 5px 20px 5px;
   margin-bottom: 10px;
   scroll-snap-type: x mandatory;
-  /* -webkit-overflow-scrolling: touch; */
-  /* scrollbar-width: thin; */
-  /* scrollbar-color: var(--primary) var(--border); */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--border);
 }
 
 .horizontal-slider::-webkit-scrollbar {
@@ -204,14 +219,14 @@ body {
   margin-bottom: 5px;
 }
 
-/* ================= FOOD GRID (UNTOUCHED) ================= */
+/* ================= FOOD GRID ================= */
 .food-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
 }
 
-/* ================= IMAGE OVERLAY CARD (UNTOUCHED - KEPT EXACTLY AS PROVIDED) ================= */
+/* ================= FOOD CARD ================= */
 .food-card-overlay {
   position: relative;
   height: 300px;
@@ -219,14 +234,15 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .food-card-overlay:hover {
   transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
 }
 
-/* Image */
+/* Image Wrapper */
 .image-wrapper {
   width: 100%;
   height: 100%;
@@ -237,127 +253,179 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
 }
 
-/* Gradient */
+.food-card-overlay:hover .image-wrapper img {
+  transform: scale(1.05);
+}
+
+/* Gradient Overlay */
 .image-gradient {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.85) 0%,
-    rgba(0,0,0,0.6) 10%,
-    rgba(0,0,0,0.2) 30%,
-    rgba(0,0,0,0.05) 50%
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.7) 30%,
+    rgba(0, 0, 0, 0.3) 60%,
+    rgba(0, 0, 0, 0.1) 80%
   );
+  z-index: 1;
+  pointer-events: none;
 }
 
-/* Veg Badge */
-.veg-icon {
+/* Veg/Non-Veg Badge */
+.category-badge {
   position: absolute;
   top: 14px;
   left: 14px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
-.veg-icon.veg {
-  color: #07f86b;
+.category-badge.veg {
+  color: #27ae60;
+  border-left: 3px solid #27ae60;
 }
 
-.veg-icon.non-veg {
-  color: #f0210a;
+.category-badge.non-veg {
+  color: #e74c3c;
+  border-left: 3px solid #e74c3c;
 }
 
 /* Food Info */
 .food-info {
   position: absolute;
-  bottom: 60px;
+  bottom: 70px;
   left: 18px;
   right: 18px;
   color: white;
   text-align: left;
+  z-index: 2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .food-info h3 {
-  font-size: 18px;
-  margin-bottom: 2px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  line-height: 1.3;
 }
 
 .food-info p {
   font-size: 13px;
-  opacity: 0.85;
+  opacity: 0.9;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.5;
 }
 
 /* Bottom Bar */
 .bottom-bar {
   position: absolute;
   bottom: 0;
-  width: 100%;
+  left: 0;
+  right: 0;
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.85) 0%,
-    rgba(0,0,0,0.6) 10%,
-    rgba(0,0,0,0.2) 20%,
-    rgba(0,0,0,0.05) 30%
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.7) 50%,
+    rgba(0, 0, 0, 0) 100%
   );
-  padding: 14px 20px;
+  padding: 20px 18px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 2;
+}
+
+.price-section {
+  flex: 1;
 }
 
 .price {
   color: white;
-  font-size: 19px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.price::before {
+  content: '₹';
+  font-size: 16px;
+  margin-right: 2px;
+  opacity: 0.9;
 }
 
 /* Add Button */
 .add-btn {
   background: var(--primary);
   color: white;
-  font-size: 15px;
-  border: none;
-  padding: 10px 30px;
-  border-radius: 8px;
+  font-size: 14px;
   font-weight: 600;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 30px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 77, 47, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .add-btn:hover {
   background: var(--primary-dark);
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 77, 47, 0.4);
+}
+
+.add-btn:active {
+  transform: scale(0.95);
 }
 
 /* Quantity Control */
 .qty-control-overlay {
   display: flex;
   align-items: center;
-  background: white;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 30px;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .qty-control-overlay button {
   border: none;
-  background: none;
-  padding: 8px 12px;
+  background: transparent;
+  padding: 8px 16px;
   cursor: pointer;
   color: var(--primary);
-  font-weight: bold;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-control-overlay button:hover {
+  background: var(--primary);
+  color: white;
 }
 
 .qty-control-overlay span {
-  padding: 0 12px;
-  font-weight: 600;
+  padding: 8px 16px;
+  font-weight: 700;
+  color: var(--gray-dark);
+  min-width: 40px;
+  text-align: center;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* ================= FLOATING BUTTONS ================= */
@@ -486,6 +554,41 @@ body {
   border-top: 2px dashed var(--border);
 }
 
+/* Form Groups in Cart */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--gray-dark);
+  font-size: 14px;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+.form-group select:hover,
+.form-group input:hover {
+  border-color: var(--primary-light);
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 77, 47, 0.1);
+}
+
 /* Cart Buttons */
 .cart-sidebar button {
   padding: 14px 20px;
@@ -572,6 +675,7 @@ body {
   border-left: 3px solid var(--primary);
   transition: var(--transition);
   animation: fadeIn 0.3s ease;
+  position: relative;
 }
 
 @keyframes fadeIn {
@@ -597,26 +701,86 @@ body {
 }
 
 .order-item-amount {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--primary-dark);
 }
 
-.delivered {
-  color: var(--success);
-  font-size: 14px;
+.order-meta {
+  font-size: 12px;
+  color: var(--gray);
+  margin: 8px 0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 5px;
-  margin-top: 5px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.pending {
-  color: var(--warning);
-  font-size: 14px;
-  display: flex;
+.order-status {
+  margin: 10px 0;
+}
+
+.delivered-badge {
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-top: 5px;
+  padding: 4px 10px;
+  background: rgba(39, 174, 96, 0.1);
+  color: var(--success);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(243, 156, 18, 0.1);
+  color: var(--warning);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.countdown-timer {
+  font-weight: 600;
+  color: var(--danger);
+  background: rgba(231, 76, 60, 0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.delete-order-btn {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 10px;
+  width: 100%;
+}
+
+.delete-order-btn:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+.expired-text {
+  color: var(--gray);
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 10px;
+  text-align: center;
+  padding: 8px;
+  background: #f1f1f1;
+  border-radius: 20px;
 }
 
 .order-total-box {
@@ -633,6 +797,7 @@ body {
   border: none;
   color: white;
   font-size: 20px;
+  text-align: center;
 }
 
 /* ================= SUCCESS MESSAGE ================= */
@@ -704,108 +869,99 @@ body {
   }
 }
 
-/* ================= SWIGGY STYLE ALL ITEMS MOBILE ================= */
 @media (max-width: 768px) {
-
-  .food-grid .food-card-overlay {
-    height: auto;
-    background: #fff;
-    border-radius: 16px;
-    padding: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  .menu-container {
+    padding: 12px;
+    padding-bottom: 100px;
   }
-
-/* IMAGE CONTAINER FIX */
-.food-grid .image-wrapper {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: flex-start;
-  gap: 14px;
-  position: relative;
-}
-
-/* IMAGE */
-.food-grid .image-wrapper img {
-  width: 130px;
-  height: 130px;
-  object-fit: cover;
-  border-radius: 16px;
-}
-
-/* VEG/NON-VEG BADGE PERFECT POSITION */
-.food-grid .veg-icon {
-  position: absolute;
-  top: 8px;
-  right: 8px;   /* sit inside image */
-  padding: 4px 0px;
-  font-size: 11px;
-  font-weight: 600; 
-  border-radius: 6px;
-  background: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  width: auto;       
-  display: inline-block; /* IMPORTANT FIX */
-}
-
-/* Veg style */
-.food-grid .veg-icon.veg {
-  color: #0f9d58;
-  border: 1px solid #0f9d58;
-}
-
-/* Non-Veg style */
-.food-grid .veg-icon.non-veg {
-  color: #d93025;
-  border: 1px solid #d93025;
-}
-  /* TEXT CONTENT */
-  .food-grid .food-info {
-    position: static;
-    color: #111;
-    flex: 1;
-    padding: 0;
+  
+  .hotel-header {
+    padding: 20px;
   }
-
-  .food-grid .food-info h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 6px;
+  
+  .hotel-header h1 {
+    font-size: 24px;
   }
-
-  .food-grid .food-info p {
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 6px;
+  
+  .search-container {
+    padding: 16px;
   }
-
-  .food-grid .price {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 6px;
+  
+  .search-container input {
+    min-width: 200px;
+    padding: 12px 12px 12px 40px;
+    font-size: 14px;
   }
-
-  /* ADD BUTTON ON IMAGE */
-  .food-grid .add-btn,
-  .food-grid .qty-control-overlay {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
+  
+  .veg-filter {
+    padding: 8px;
   }
-
-  .food-grid .add-btn {
-    background: white;
-    color: #1ba672;
-    border: 1px solid #1ba672;
-    font-weight: 600;
-    padding: 6px 18px;
-    font-size: 13px;
-    border-radius: 8px;
+  
+  .veg-filter button {
+    padding: 10px;
+    font-size: 14px;
   }
-
-  .food-grid .add-btn:hover {
-    background: #e9f8f2;
+  
+  .section-title {
+    font-size: 20px;
+    margin: 25px 0 12px;
   }
-
+  
+  .horizontal-slider {
+    gap: 12px;
+    padding: 5px 5px 15px 5px;
+  }
+  
+  .horizontal-slider .food-card-overlay {
+    min-width: 260px;
+    width: 260px;
+    height: 260px;
+  }
+  
+  .food-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .food-card-overlay {
+    height: 280px;
+  }
+  
+  .food-info {
+    bottom: 65px;
+  }
+  
+  .food-info h3 {
+    font-size: 18px;
+  }
+  
+  .price {
+    font-size: 20px;
+  }
+  
+  .cart-sidebar,
+  .order-slider {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .floating-cart,
+  .floating-orders {
+    right: 15px;
+    padding: 12px 18px;
+    font-size: 14px;
+  }
+  
+  .floating-orders {
+    bottom: 85px;
+  }
+  
+  .order-message {
+    width: 90%;
+    text-align: center;
+    font-size: 14px;
+    padding: 12px 20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -832,14 +988,22 @@ body {
     padding: 15px;
   }
   
-  .search-container input,
-  .search-container select {
+  .search-container input {
     width: 100%;
     min-width: 100%;
   }
   
   .search-container svg {
     left: 28px;
+  }
+  
+  .veg-filter {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .veg-filter button {
+    width: 100%;
   }
   
   .section-title {
@@ -863,8 +1027,15 @@ body {
     height: 240px;
   }
   
+  .food-info {
+    bottom: 60px;
+    left: 14px;
+    right: 14px;
+  }
+  
   .food-info h3 {
     font-size: 16px;
+    margin-bottom: 2px;
   }
   
   .food-info p {
@@ -873,7 +1044,7 @@ body {
   }
   
   .price {
-    font-size: 16px;
+    font-size: 18px;
   }
   
   .add-btn {
@@ -882,12 +1053,13 @@ body {
   }
   
   .qty-control-overlay button {
-    padding: 6px 10px;
+    padding: 6px 12px;
   }
   
   .qty-control-overlay span {
-    padding: 0 8px;
-    font-size: 14px;
+    padding: 6px 8px;
+    font-size: 13px;
+    min-width: 30px;
   }
   
   .cart-sidebar h2,
@@ -922,6 +1094,20 @@ body {
     font-size: 14px;
   }
   
+  .order-meta {
+    font-size: 11px;
+  }
+  
+  .countdown-timer {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  
+  .delete-order-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
   .order-total-box h3 {
     font-size: 18px;
   }
@@ -936,26 +1122,38 @@ body {
   }
   
   .food-info {
-    bottom: 70px;
+    bottom: 55px;
     left: 12px;
     right: 12px;
   }
   
   .food-info h3 {
     font-size: 15px;
-    margin-bottom: 3px;
+  }
+  
+  .food-info p {
+    font-size: 10px;
   }
   
   .bottom-bar {
-    padding: 10px 15px;
+    padding: 15px 12px 10px;
   }
   
   .price {
-    font-size: 15px;
+    font-size: 16px;
   }
   
   .add-btn {
     padding: 6px 16px;
+    font-size: 12px;
+  }
+  
+  .qty-control-overlay button {
+    padding: 4px 8px;
+  }
+  
+  .qty-control-overlay span {
+    padding: 4px 6px;
     font-size: 12px;
   }
 }
@@ -986,6 +1184,7 @@ body {
   .floating-cart,
   .floating-orders,
   .search-container,
+  .veg-filter,
   .cart-sidebar,
   .order-slider,
   .order-message,
@@ -1006,5 +1205,9 @@ body {
     overflow-x: visible;
     flex-wrap: wrap;
     justify-content: center;
+  }
+  
+  .horizontal-slider .food-card-overlay {
+    page-break-inside: avoid;
   }
 }

@@ -109,8 +109,7 @@ function MenuPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveOrders(prev => [...prev]);
-    }, 10000); // check every 10 sec
-
+    }, 1000); // update every 1 second for countdown
     return () => clearInterval(interval);
   }, []);
 
@@ -485,10 +484,22 @@ function MenuPage() {
             activeOrders.map(order => {
               const orderedTime = new Date(order.orderedAt).getTime();
               const now = Date.now();
-              const diffMinutes = (now - orderedTime) / 1000 / 60;
 
-              const canDelete = diffMinutes <= 5 && !order.delivered;
+              const cancelDuration = 5 * 60 * 1000; // 5 minutes in ms
+              const timePassed = now - orderedTime;
+              const timeLeft = cancelDuration - timePassed;
 
+              const canDelete = timeLeft > 0 && !order.delivered;
+
+              const minutes = Math.floor((timeLeft / 1000 / 60) % 60);
+              const seconds = Math.floor((timeLeft / 1000) % 60);
+
+              const formattedTime =
+                timeLeft > 0
+                  ? `${minutes.toString().padStart(2, "0")}:${seconds
+                    .toString()
+                    .padStart(2, "0")}`
+                  : "00:00";
               return (
                 <div key={order.foodId} className="order-card">
 
@@ -503,11 +514,17 @@ function MenuPage() {
                   </div>
 
                   <div className="order-meta">
-                    🕒 {new Date(order.orderedAt).toLocaleTimeString([], {
+                    🕒 Ordered at: {new Date(order.orderedAt).toLocaleTimeString([], {
                       hour: "numeric",
                       minute: "2-digit",
                       hour12: true
                     })}
+
+                    {!order.delivered && (
+                      <div className="countdown-timer">
+                        ⏳ Cancel in: {formattedTime}
+                      </div>
+                    )}
                   </div>
 
                   <div className="order-status">
@@ -518,7 +535,7 @@ function MenuPage() {
                     )}
                   </div>
 
-                  {canDelete && (
+                  {canDelete ? (
                     <button
                       className="delete-order-btn"
                       onClick={() =>
@@ -527,7 +544,11 @@ function MenuPage() {
                     >
                       🗑 Cancel Order
                     </button>
-                  )}
+                  ) : !order.delivered ? (
+                    <div className="expired-text">
+                      ❌ Cancel time expired
+                    </div>
+                  ) : null}
 
                 </div>
               );
