@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./bookings.css";
@@ -11,10 +12,9 @@ function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // const [ ] = useState({});
 
   /* ==============================
-     LOAD HOTEL
+       LOAD HOTEL
   ============================== */
   useEffect(() => {
     const storedHotel = localStorage.getItem("hotelUser");
@@ -32,20 +32,20 @@ function BookingsPage() {
   }, [navigate]);
 
   /* ==============================
-     FETCH BOOKINGS
+       FETCH BOOKINGS
   ============================== */
   const fetchBookings = useCallback(async () => {
     if (!hotel?._id) return;
-  
+
     try {
       const res = await fetch(`${API}/api/bookings/${hotel._id}`);
       const data = await res.json();
-  
+
       if (data.success) {
         const sortedBookings = data.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-      
+
         setBookings(sortedBookings);
       } else {
         setError("Failed to load bookings.");
@@ -67,7 +67,7 @@ function BookingsPage() {
   }, [hotel, fetchBookings]);
 
   /* ==============================
-     REDUCE QUANTITY
+       REDUCE QUANTITY
   ============================== */
   const reduceQuantity = async (bookingId, foodId) => {
     try {
@@ -91,33 +91,7 @@ function BookingsPage() {
   };
 
   /* ==============================
-     DELETE ITEM COMPLETELY
-  ============================== */
-  const deleteItemCompletely = async (bookingId, foodId) => {
-    if (!window.confirm("Delete this item completely?")) return;
-
-    try {
-      const res = await fetch(
-        `${API}/api/bookings/delete-item/${bookingId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ foodId }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.success) {
-        updateBookingState(bookingId, data.data);
-      }
-    } catch (err) {
-      console.error("Delete error:", err);
-    }
-  };
-
-  /* ==============================
-     MARK AS DELIVERED (UI ONLY)
+       MARK AS DELIVERED
   ============================== */
   const markAsDelivered = async (bookingId, foodId) => {
     try {
@@ -129,9 +103,9 @@ function BookingsPage() {
           body: JSON.stringify({ foodId }),
         }
       );
-  
+
       const data = await res.json();
-  
+
       if (data.success) {
         updateBookingState(bookingId, data.data);
       }
@@ -141,7 +115,7 @@ function BookingsPage() {
   };
 
   /* ==============================
-     COMPLETE TABLE
+       COMPLETE TABLE ORDERS
   ============================== */
   const completeTableOrders = async (tableBookings) => {
     if (!window.confirm("Complete all orders for this table?")) return;
@@ -162,7 +136,7 @@ function BookingsPage() {
   };
 
   /* ==============================
-     UPDATE LOCAL STATE
+       UPDATE LOCAL STATE
   ============================== */
   const updateBookingState = (bookingId, updatedBooking) => {
     setBookings((prev) =>
@@ -171,7 +145,7 @@ function BookingsPage() {
   };
 
   /* ==============================
-     RENDER
+       RENDER SECTION
   ============================== */
   if (loading) return <div className="loading">Loading...</div>;
   if (!hotel) return null;
@@ -184,123 +158,149 @@ function BookingsPage() {
       {error && <p className="error">{error}</p>}
 
       <div className="tables-grid">
-        {[...Array(totalTables)].map((_, index) => {
-          const tableNumber = index + 1;
+        {(() => {
+          /* Step 1 → Find earliest order time per table */
+          const tableOrderTimes = [...Array(totalTables)].map((_, index) => {
+            const tableNumber = index + 1;
 
-          const tableBookings = bookings.filter(
-            (b) =>
-              Number(b.tableNumber) === tableNumber &&
-              b.status === "active"
-          );
+            const tableBookings = bookings.filter(
+              (b) =>
+                Number(b.tableNumber) === tableNumber &&
+                b.status === "active"
+            );
 
-          const tableTotal = tableBookings.reduce(
-            (sum, booking) => sum + booking.totalAmount,
-            0
-          );
+            let earliest = null;
+            if (tableBookings.length > 0) {
+              earliest = Math.min(
+                ...tableBookings.map((b) =>
+                  new Date(b.createdAt).getTime()
+                )
+              );
+            }
 
-          const isBooked = tableBookings.length > 0;
+            return { tableNumber, earliest, tableBookings };
+          });
 
-          return (
-            <div
-              key={tableNumber}
-              className={`table-card ${
-                isBooked ? "booked" : "available"
-              }`}
-            >
-              <h3>Table {tableNumber}</h3>
+          /* Step 2 → Sort tables (earliest order first) */
+          const sortedTables = tableOrderTimes.sort((a, b) => {
+            if (a.earliest && b.earliest) {
+              return a.earliest - b.earliest;
+            }
+            if (a.earliest) return -1;
+            if (b.earliest) return 1;
+            return a.tableNumber - b.tableNumber;
+          });
 
-              {isBooked ? (
-                <div className="booking-box">
-                  <strong>🍽 Active Orders</strong>
+          /* Step 3 → Render sorted tables */
+          return sortedTables.map(({ tableNumber, tableBookings }) => {
+            const tableTotal = tableBookings.reduce(
+              (sum, booking) => sum + booking.totalAmount,
+              0
+            );
 
-                  <div className="orders-list">
-                    {tableBookings.map((booking) =>
-                      booking.orders.map((item) => {
-                        const key = `${booking._id}-${item.foodId}`;
-                        const isDelivered = item.delivered;
+            const isBooked = tableBookings.length > 0;
 
-                        return (
-                          <div key={key} className="order-row">
-                            <div className="order-details">
-                              <strong>{item.title}</strong>
-                              <span>Qty: {item.quantity}</span>
+            return (
+              <div
+                key={tableNumber}
+                className={`table-card ${isBooked ? "booked" : "available"
+                  }`}
+              >
+                <h3>Table {tableNumber}</h3>
 
-                              <span
-                                className={
-                                  isDelivered
-                                    ? "price-delivered"
-                                    : "price-pending"
-                                }
-                              >
-                                ₹{item.price * item.quantity}
-                              </span>
+                {isBooked ? (
+                  <div className="booking-box">
+                    <strong>🍽 Active Orders</strong>
+
+                    <div className="orders-list">
+                      {tableBookings.map((booking) =>
+                        booking.orders.map((item) => {
+                          const key = `${booking._id}-${item.foodId}`;
+                          const isDelivered = item.delivered;
+
+                          return (
+                            <div key={key} className="order-row">
+                              <div className="order-details">
+                                <strong>{item.title}</strong>
+                                <span>Qty: {item.quantity}</span>
+
+                                <span className="item-time">
+                                   {new Date(item.orderedAt).toLocaleTimeString([], {
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true
+                                  })}
+                                </span>
+
+                                <span
+                                  className={
+                                    isDelivered
+                                      ? "price-delivered"
+                                      : "price-pending"
+                                  }
+                                >
+                                  ₹{item.price * item.quantity}
+                                </span>
+                              </div>
+
+                              <div className="action-buttons">
+                                <button
+                                  className="reduce-btn"
+                                  onClick={() =>
+                                    reduceQuantity(
+                                      booking._id,
+                                      item.foodId
+                                    )
+                                  }
+                                >
+                                  🗑
+                                </button>
+
+                                <button
+                                  className="delete-btn"
+                                  disabled={isDelivered}
+                                  onClick={() =>
+                                    markAsDelivered(
+                                      booking._id,
+                                      item.foodId
+                                    )
+                                  }
+                                >
+                                  {isDelivered
+                                    ? "✔ Delivered"
+                                    : "🚚 Deliver"}
+                                </button>
+                              </div>
                             </div>
-
-                            <div className="action-buttons">
-                              <button
-                                className="reduce-btn"
-                                onClick={() =>
-                                  reduceQuantity(
-                                    booking._id,
-                                    item.foodId
-                                  )
-                                }
-                              >
-                                ➖
-                              </button>
-
-                              <button
-                                className="delete-btn"
-                                onClick={() =>
-                                  deleteItemCompletely(
-                                    booking._id,
-                                    item.foodId
-                                  )
-                                }
-                              >
-                                🗑
-                              </button>
-
-                              <button
-                                className="delete-btn"
-                                disabled={isDelivered}
-                                onClick={() =>
-                                  markAsDelivered(
-                                    booking._id,
-                                    item.foodId
-                                  )
-                                }
-                              >
-                                {isDelivered
-                                  ? "✔ Delivered"
-                                  : "🚚 Deliver"}
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
+                          );
+                        })
+                      )}
+                    </div>
+                    {/* order time */}
+                    <h4 className="table-total">Total ₹{tableTotal}</h4>
+                    <p className="order-time">
+                      ⏱️ {new Date(tableBookings[0]?.createdAt).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true
+                      })}
+                    </p>
+                    <button
+                      className="complete-btn"
+                      onClick={() =>
+                        completeTableOrders(tableBookings)
+                      }
+                    >
+                      Dinner Completed
+                    </button>
                   </div>
-
-                  <h4 className="table-total">
-                    Total ₹{tableTotal}
-                  </h4>
-
-                  <button
-                    className="complete-btn"
-                    onClick={() =>
-                      completeTableOrders(tableBookings)
-                    }
-                  >
-                    Dinner Completed
-                  </button>
-                </div>
-              ) : (
-                <p className="available-text">Available</p>
-              )}
-            </div>
-          );
-        })}
+                ) : (
+                  <p className="available-text">Available</p>
+                )}
+              </div>
+            );
+          });
+        })()}
       </div>
 
       <button

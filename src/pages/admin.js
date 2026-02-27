@@ -457,10 +457,10 @@ function AdminDashboard() {
 
                     <div className="food-details">
                       <div className="food-price">₹{food.price}</div>
-                      <div className="food-time">
+                      {/* <div className="food-time">
                         <Clock size={14} />
                         {food.preparationTime || '15-20 mins'}
-                      </div>
+                      </div> */}
                       <div className="food-type-badge">
                         {food.foodCategory?.toUpperCase()}
                       </div>
