@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Utensils, LogOut, Edit, Trash2, Plus, X,
-  Clock, Camera, Check
+   Camera, Check
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './admin.css';
