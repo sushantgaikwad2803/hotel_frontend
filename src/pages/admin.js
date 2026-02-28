@@ -45,6 +45,17 @@ function AdminDashboard() {
 
   const [hotelImagePreview, setHotelImagePreview] = useState(null);
 
+  useEffect(() => {
+    document.body.classList.toggle(
+      "modal-open",
+      showFoodModal || showEditHotelModal
+    );
+  
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [showFoodModal, showEditHotelModal]);
+
   // 🔐 Auth Check
   useEffect(() => {
     const savedUser = localStorage.getItem("hotelUser");

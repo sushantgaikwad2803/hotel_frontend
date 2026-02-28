@@ -69,12 +69,16 @@ body {
   line-height: 1.5;
 }
 
+/* 🔒 Lock background scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
   overflow-x: hidden; 
-  overflow-y: auto;
 }
 
 /* ================= LOADING STATE ================= */
@@ -120,7 +124,7 @@ html, body {
   border-bottom: 2px solid var(--primary-soft);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 50;
 }
 
 .header-left {
@@ -465,6 +469,7 @@ html, body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
+  isolation: isolate;
 }
 
 .food-item-card {
@@ -476,6 +481,8 @@ html, body {
   transition: var(--transition);
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .food-item-card:hover {
@@ -702,6 +709,7 @@ html, body {
   z-index: 1000;
   animation: fadeIn 0.2s ease;
   padding: 1rem;
+  overscroll-behavior: contain;
 }
 
 @keyframes fadeIn {
@@ -719,6 +727,7 @@ html, body {
   overflow-y: auto;
   box-shadow: var(--shadow-xl);
   animation: slideUp 0.3s ease;
+  overscroll-behavior: contain;
 }
 
 @keyframes slideUp {
