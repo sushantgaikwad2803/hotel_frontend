@@ -718,7 +718,7 @@ function AdminDashboard() {
                   onChange={(e) => setFoodForm({ ...foodForm, description: e.target.value })}
                   required
                   rows="3"
-                  placeholder="Describe the food item..."
+                  placeholder="Food Quantity..."
                 />
               </div>
 

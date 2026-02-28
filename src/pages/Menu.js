@@ -151,6 +151,25 @@ function MenuPage() {
     );
   }, [filteredFoods]);
 
+  const rotiRiceDrinksTitle = useMemo(() => {
+    const categoryMap = {
+      roti: "Roti",
+      rice: "Rice",
+      drinks: "Drinks",
+    };
+  
+    const availableCategories = Array.from(
+      new Set(
+        rotiRiceDrinksFoods.map(f => f.foodCategory?.toLowerCase())
+      )
+    );
+  
+    return availableCategories
+      .map(cat => categoryMap[cat])
+      .filter(Boolean)
+      .join(" • ");
+  }, [rotiRiceDrinksFoods]);
+
   /* ================= CART ================= */
 
   const getQty = id =>
@@ -395,7 +414,7 @@ function MenuPage() {
       {/* ROTI RICE DRINKS */}
       {rotiRiceDrinksFoods.length > 0 && (
         <>
-          <h2 className="section-title">Roti • Rice • Drinks</h2>
+          <h2 className="section-title">{rotiRiceDrinksTitle}</h2>
           <div className="horizontal-slider">
             {rotiRiceDrinksFoods.map(renderFoodCard)}
           </div>

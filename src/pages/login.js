@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Hotel, Mail, Lock, LogIn, X } from 'lucide-react';
 import './login.css';
-import { Link, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
 function Login() {
   const navigate = useNavigate();
@@ -199,7 +199,7 @@ function Login() {
           </form>
 
           <div className="signup-link">
-            Don’t have an account? <Link to="/signup">Sign up</Link>
+            {/* Don’t have an account? <Link to="/signup">Sign up</Link> */}
           </div>
         </div>
       </div>
