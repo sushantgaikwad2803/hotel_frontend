@@ -384,8 +384,12 @@ html, body {
 .section-title h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--primary-dark);
+  /* color: var(--primary-dark); */
   margin-bottom: 0.25rem;
+}
+
+#color {
+  background-color:#fef9f4;
 }
 
 .section-title p {

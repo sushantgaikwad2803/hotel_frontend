@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  Hotel, Mail, Lock, MapPin, Building, Globe, ArrowRight, 
+import {
+  Hotel, Mail, Lock, MapPin, Building, Globe, ArrowRight,
   Camera, Upload, X, Image as ImageIcon, Users,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,10 @@ function Signup() {
     address: '',
     city: '',
     state: '',
-    tableCount: 0,
+    hotelType: '',
+    sections: [
+      { sectionName: '', tableCount: 0 }
+    ],
     hotelImage: null
   });
 
@@ -29,6 +32,32 @@ function Signup() {
   const [imagePreview, setImagePreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+
+  const addSection = () => {
+    setFormData(prev => ({
+      ...prev,
+      sections: [...prev.sections, { sectionName: '', tableCount: 0 }]
+    }));
+  };
+
+  const handleSectionChange = (index, field, value) => {
+    const updatedSections = [...formData.sections];
+    updatedSections[index][field] = value;
+
+    setFormData(prev => ({
+      ...prev,
+      sections: updatedSections
+    }));
+  };
+
+  const removeSection = (index) => {
+    const updatedSections = formData.sections.filter((_, i) => i !== index);
+
+    setFormData(prev => ({
+      ...prev,
+      sections: updatedSections
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -171,13 +200,19 @@ function Signup() {
       newErrors.state = 'Please enter a valid state name';
     }
 
-    if (!formData.tableCount) {
-      newErrors.tableCount = 'Table count is required';
-    } else if (formData.tableCount < 1) {
-      newErrors.tableCount = 'Table count must be at least 1';
-    } else if (formData.tableCount > 500) {
-      newErrors.tableCount = 'Table count cannot exceed 500';
+    if (!formData.hotelType) {
+      newErrors.hotelType = "Please select hotel type";
     }
+
+    formData.sections.forEach((section, index) => {
+      if (!section.sectionName.trim()) {
+        newErrors[`sectionName${index}`] = "Section name required";
+      }
+
+      if (!section.tableCount || section.tableCount < 1) {
+        newErrors[`tableCount${index}`] = "Table count must be at least 1";
+      }
+    });
 
     if (!imagePreview) {
       newErrors.images = 'Please upload a hotel image';
@@ -189,10 +224,10 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
-  
+
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
-  
+
       const data = new FormData();
       data.append('hotelName', formData.hotelName);
       data.append('email', formData.email);
@@ -200,20 +235,21 @@ function Signup() {
       data.append('address', formData.address);
       data.append('city', formData.city);
       data.append('state', formData.state);
-      data.append('tableCount', formData.tableCount);
-      
+      data.append('hotelType', formData.hotelType);
+      data.append('sections', JSON.stringify(formData.sections));
+
       if (formData.hotelImage) {
         data.append('hotelImage', formData.hotelImage);
       }
-  
+
       try {
         const response = await fetch(`${API}/api/hotel/signup`, {
           method: 'POST',
           body: data,
         });
-  
+
         const result = await response.json();
-  
+
         if (result.success) {
           alert("Registration Successful!");
           navigate('/login');
@@ -337,46 +373,77 @@ function Signup() {
               {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
             </div>
 
+
+            {/* Hotel Type */}
+            <div className="input-group">
+              <label htmlFor="hotelType">
+                <Hotel size={18} />
+                <span>Hotel Type</span>
+              </label>
+
+              <select
+                id="hotelType"
+                name="hotelType"
+                value={formData.hotelType}
+                onChange={handleChange}
+                className={errors.hotelType ? "error" : ""}
+              >
+                <option value="">Select Hotel Type</option>
+                <option value="hotel_only">Hotel Only (Restaurant)</option>
+                <option value="hotel_with_lodging">Hotel With Lodging</option>
+              </select>
+
+              {errors.hotelType && (
+                <span className="error-message">{errors.hotelType}</span>
+              )}
+            </div>
+
             {/* Table Count Field */}
             <div className="input-group">
-              <label htmlFor="tableCount">
+              <label>
                 <Users size={18} />
-                <span>Number of Tables</span>
+                <span>Hotel Sections</span>
               </label>
-              <div className="table-count-wrapper">
-                <button
-                  type="button"
-                  className="table-count-btn"
-                  onClick={() => setFormData(prev => ({ 
-                    ...prev, 
-                    tableCount: Math.max(1, (prev.tableCount || 1) - 1) 
-                  }))}
-                >
-                  −
-                </button>
-                <input
-                  type="number"
-                  id="tableCount"
-                  name="tableCount"
-                  value={formData.tableCount || ''}
-                  onChange={handleChange}
-                  min="1"
-                  max="500"
-                  placeholder="0"
-                  className={errors.tableCount ? 'error table-count-input' : 'table-count-input'}
-                />
-                <button
-                  type="button"
-                  className="table-count-btn"
-                  onClick={() => setFormData(prev => ({ 
-                    ...prev, 
-                    tableCount: Math.min(500, (prev.tableCount || 0) + 1) 
-                  }))}
-                >
-                  +
-                </button>
-              </div>
-              {errors.tableCount && <span className="error-message">{errors.tableCount}</span>}
+
+              {formData.sections.map((section, index) => (
+                <div key={index} className="section-row">
+
+                  <input
+                    type="text"
+                    placeholder="Section Name (F1 / Garden / Rooftop)"
+                    value={section.sectionName}
+                    onChange={(e) =>
+                      handleSectionChange(index, "sectionName", e.target.value)
+                    }
+                  />
+
+                  <input
+                    type="number"
+                    placeholder="Table Count"
+                    min="1"
+                    value={section.tableCount}
+                    onChange={(e) =>
+                      handleSectionChange(index, "tableCount", e.target.value)
+                    }
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeSection(index)}
+                  >
+                    <X size={16} />
+                  </button>
+
+                </div>
+              ))}
+
+              <button
+                type="button"
+                className="add-section-btn"
+                onClick={addSection}
+              >
+                + Add Section
+              </button>
             </div>
 
             {/* Address Field */}
@@ -440,9 +507,9 @@ function Signup() {
                 <Camera size={18} />
                 <span>Hotel Image</span>
               </label>
-              
+
               {!imagePreview ? (
-                <div 
+                <div
                   className={`image-upload-area ${isDragging ? 'dragging' : ''} ${errors.images ? 'error' : ''}`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -457,13 +524,13 @@ function Signup() {
                     className="file-input"
                     style={{ display: 'none' }}
                   />
-                  
+
                   <ImageIcon size={32} className="upload-icon" />
                   <p className="upload-text">
                     <span className="upload-link">Click to upload</span> or drag and drop
                   </p>
                   <p className="upload-hint">PNG, JPG, GIF up to 5MB</p>
-                  
+
                   {uploadProgress > 0 && uploadProgress < 100 && (
                     <div className="upload-progress">
                       <div className="progress-bar" style={{ width: `${uploadProgress}%` }}></div>
@@ -497,13 +564,18 @@ function Signup() {
             </div>
 
             {/* Summary Section */}
-            {formData.tableCount > 0 && (
+            {formData.sections.length > 0 && (
               <div className="signup-summary">
-                <h4>Registration Summary</h4>
-                <div className="summary-item">
-                  <Users size={16} />
-                  <span>Hotel will have <strong>{formData.tableCount} tables</strong> available for booking</span>
-                </div>
+                <h4>Sections Summary</h4>
+
+                {formData.sections.map((s, i) => (
+                  <div key={i} className="summary-item">
+                    <Users size={16} />
+                    <span>
+                      {s.sectionName || "Section"} : <strong>{s.tableCount || 0}</strong> tables
+                    </span>
+                  </div>
+                ))}
               </div>
             )}
 

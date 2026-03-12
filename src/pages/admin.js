@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Utensils, LogOut, Edit, Trash2, Plus, X,
-   Camera, Check
+  Camera, Check
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './admin.css';
@@ -50,7 +50,7 @@ function AdminDashboard() {
       "modal-open",
       showFoodModal || showEditHotelModal
     );
-  
+
     return () => {
       document.body.classList.remove("modal-open");
     };
@@ -301,7 +301,21 @@ function AdminDashboard() {
           <div className="hotel-profile-card">
             <div className="hotel-cover-image">
               <img src={hotel.hotelImage || 'https://via.placeholder.com/1200x300'} alt={hotel.hotelName} />
-              <button className="edit-cover-btn" onClick={() => setShowEditHotelModal(true)}>
+              <button
+                className="edit-cover-btn"
+                onClick={() => {
+                  setHotelForm({
+                    hotelName: hotel.hotelName,
+                    email: hotel.email,
+                    address: hotel.address,
+                    city: hotel.city,
+                    state: hotel.state,
+                    hotelImage: hotel.hotelImage
+                  });
+                  setHotelImagePreview(hotel.hotelImage);
+                  setShowEditHotelModal(true);
+                }}
+              >
                 <Edit size={16} />
                 Edit Hotel Details
               </button>
@@ -332,7 +346,11 @@ function AdminDashboard() {
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Total Tables:</span>
-                  <span className="detail-value">{hotel.tableCount || 0}</span>
+                  <span className="detail-value">
+                    {hotel.sections
+                      ? hotel.sections.reduce((sum, s) => sum + Number(s.tableCount || 0), 0)
+                      : hotel.tableCount || 0}
+                  </span>
                 </div>
               </div>
             </div>
@@ -400,7 +418,7 @@ function AdminDashboard() {
         {/* Food Management Section */}
         <div className="food-management-section">
           <div className="section-header">
-            <div className="section-title">
+            <div className="section-title" id="color">
               <h2>Food Menu</h2>
               <p>Manage your hotel's food items</p>
             </div>
@@ -577,15 +595,14 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label>Total Tables</label>
                 <input
                   type="number"
                   value={hotelForm.tableCount || 0}
                   onChange={(e) => setHotelForm({ ...hotelForm, tableCount: e.target.value })}
-                  placeholder="Enter total tables"
                 />
-              </div>
+              </div> */}
 
               <div className="form-group">
                 <label>Hotel Image</label>

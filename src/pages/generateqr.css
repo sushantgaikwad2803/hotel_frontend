@@ -1,614 +1,569 @@
 /* generateqr.css */
 
-/* Reset and Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root {
+  --primary-light: #EABA87;
+  --primary-color: #8E551D;
+  --primary-dark: #49250E;
+  --success-color: #27ae60;
+  --danger-color: #c0392b;
+  --text-dark: #2c3e50;
+  --text-light: #6c757d;
+  --text-muted: #95a5a6;
+  --text-white: #ffffff;
+  --bg-light: #fef9f4;
+  --bg-white: #ffffff;
+  --border-color: #e9d9c8;
+}
+
+body {
+  background-color: var(--bg-light);
+}
+
+/* Main Container */
+.generate-qr-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background-color: var(--bg-light);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Header Section */
+.qr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--primary-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.qr-header h2 {
+  color: var(--primary-dark);
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Hotel Info Badge */
+.hotel-info-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: var(--text-white);
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(142, 85, 29, 0.2);
+}
+
+.hotel-info-badge strong {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+/* Stats Section */
+.qr-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-item {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(142, 85, 29, 0.08);
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(142, 85, 29, 0.15);
+}
+
+.stat-value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1.2;
+}
+
+.stat-label {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-top: 0.5rem;
+}
+
+/* Section Blocks */
+.section-block {
+  margin-bottom: 2.5rem;
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(142, 85, 29, 0.08);
+  border: 1px solid var(--border-color);
+}
+
+.section-title {
+  color: var(--primary-dark);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  background-color: var(--bg-white);
+  font-weight: 500;
+}
+
+/* QR Grid */
+.qr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* QR Card */
+.qr-card {
+  background: linear-gradient(135deg, var(--bg-white), var(--bg-light));
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(142, 85, 29, 0.08);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(142, 85, 29, 0.15);
+  border-color: var(--primary-light);
+}
+
+.qr-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.qr-card:hover::before {
+  transform: translateY(0);
+}
+
+/* Table Number */
+.table-number {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: var(--bg-light);
+  border-radius: 25px;
+  border: 1px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-number span {
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  background: var(--primary-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* QR Code Container */
+.qr-code-container {
+  background: var(--bg-white);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-code-container canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* QR Link */
+.qr-link {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  background: var(--bg-light);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin: 0.5rem 0 1rem;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  border: 1px dashed var(--border-color);
+  transition: all 0.2s ease;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qr-link:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border-color: var(--primary-color);
+}
+
+/* Download Button */
+.download-btn {
+  background: var(--primary-color);
+  color: var(--text-white);
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.download-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(0.98);
+  box-shadow: 0 4px 15px rgba(142, 85, 29, 0.3);
+}
+
+.download-btn:active {
+  transform: scale(0.95);
+}
+
+/* Back Button */
+.back-btn {
+  padding: 0.8rem 1.5rem;
+  background: var(--primary-color);
+  color: var(--text-white);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: var(--primary-dark);
+  transform: translateX(-2px);
+}
+
+/* No Tables State */
+.no-tables {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--bg-white);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(142, 85, 29, 0.08);
+  border: 1px solid var(--border-color);
+  max-width: 500px;
+  margin: 3rem auto;
+}
+
+.no-tables div {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.no-tables h3 {
+  color: var(--primary-dark);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.no-tables p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.no-tables button {
+  background: var(--primary-color);
+  color: var(--text-white);
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.no-tables button:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+/* Toast Message */
+.toast-message {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary-dark);
+  color: var(--text-white);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+  z-index: 1000;
+  border: 1px solid var(--primary-light);
+}
+
+@keyframes slideUp {
+  from {
+    bottom: 0;
+    opacity: 0;
   }
-  
-  :root {
-    --primary-light: #EABA87;
-    --primary-color: #8E551D;
-    --primary-dark: #49250E;
-    --success-color: #27ae60;
-    --danger-color: #c0392b;
-    --text-dark: #2c3e50;
-    --text-light: #6c757d;
-    --text-muted: #95a5a6;
-    --text-white: #ffffff;
-    --bg-light: #fef9f4;
-    --bg-white: #ffffff;
-    --border-color: #e9d9c8;
-    --shadow-sm: 0 2px 4px rgba(142, 85, 29, 0.05);
-    --shadow-md: 0 4px 6px rgba(142, 85, 29, 0.1);
-    --shadow-lg: 0 10px 15px rgba(142, 85, 29, 0.1);
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --transition: all 0.3s ease;
+  to {
+    bottom: 2rem;
+    opacity: 1;
   }
-  
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    background: var(--bg-light);
-    color: var(--text-dark);
-    line-height: 1.5;
+}
+
+/* Scrollbar Styling */
+.generate-qr-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.generate-qr-container::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+.generate-qr-container::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 10px;
+}
+
+.generate-qr-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .qr-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .generate-qr-container {
+    padding: 1rem;
   }
 
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; 
-    overflow-y:auto/* Prevent body scroll, let dashboard handle it */
-  }
-  
-  /* Main Container */
-  .generate-qr-container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: var(--bg-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-  }
-  
-  /* Header Section */
   .qr-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--primary-light);
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
+
   .qr-header h2 {
-    font-size: 2rem;
-    color: var(--primary-dark);
-    font-weight: 600;
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.8rem;
   }
-  
-  /* Back Button */
+
   .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--bg-white);
-    color: var(--primary-dark);
-    border: 2px solid var(--primary-light);
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  
-  .back-btn:hover {
-    background: var(--primary-light);
-    border-color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-  
-  .back-btn:active {
-    transform: translateY(0);
-  }
-  
-  .back-btn::before {
-    content: '←';
-    font-size: 1.2rem;
-    line-height: 1;
-  }
-  
-  /* Hotel Info Badge */
-  .hotel-info-badge {
-    display: inline-block;
-    padding: 0.5rem 1.5rem;
-    background: var(--bg-light);
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    color: var(--primary-dark);
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
-  }
-  
-  .hotel-info-badge strong {
-    color: var(--primary-color);
-    font-weight: 600;
-  }
-  
-  /* QR Codes Grid */
-  .qr-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-  }
-  
-  /* QR Card */
-  .qr-card {
-    background: var(--bg-white);
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    text-align: center;
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .qr-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-light), var(--primary-color));
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
-  
-  .qr-card:hover::before {
-    transform: scaleX(1);
-  }
-  
-  .qr-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-color);
-  }
-  
-  /* Table Number */
-  .table-number {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px dashed var(--primary-light);
-  }
-  
-  .table-number span {
-    background: var(--primary-light);
-    color: var(--primary-dark);
-    padding: 0.25rem 1rem;
-    border-radius: 50px;
-    font-size: 1rem;
-    margin-left: 0.5rem;
-  }
-  
-  /* QR Code Container */
-  .qr-code-container {
-    background: var(--bg-white);
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 1rem;
-    display: inline-block;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-  }
-  
-  .qr-code-container canvas {
-    display: block;
-    margin: 0 auto;
-    border-radius: var(--radius-sm);
-  }
-  
-  /* QR Value/Link */
-  .qr-link {
-    margin: 1rem 0;
-    padding: 0.75rem;
-    background: var(--bg-light);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    word-break: break-all;
-    font-family: monospace;
-    cursor: pointer;
-    transition: var(--transition);
-    position: relative;
-  }
-  
-  .qr-link:hover {
-    background: var(--primary-light);
-    color: var(--primary-dark);
-    border-color: var(--primary-color);
-  }
-  
-  /* Copy Tooltip */
-  .qr-link:hover::after {
-    content: 'Click to copy';
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-dark);
-    color: var(--text-white);
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.7rem;
-    white-space: nowrap;
-    animation: fadeIn 0.2s ease;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateX(-50%) translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-  
-  /* Download Button */
-  .download-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
     width: 100%;
-    padding: 0.75rem;
-    background: var(--primary-color);
-    color: var(--text-white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    margin-top: 0.5rem;
   }
-  
-  .download-btn:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-  
-  .download-btn:active {
-    transform: translateY(0);
-  }
-  
-  .download-btn::after {
-    content: '⬇️';
-    font-size: 1rem;
-  }
-  
-  /* Print All Button */
-  .print-all-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    background: var(--success-color);
-    color: var(--text-white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    margin: 2rem 0 1rem;
-  }
-  
-  .print-all-btn:hover {
-    background: #219a52;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-  
-  .print-all-btn::before {
-    content: '🖨️';
-    font-size: 1.2rem;
-  }
-  
-  /* Stats Section */
+
   .qr-stats {
-    display: flex;
-    gap: 2rem;
-    margin: 2rem 0;
-    padding: 1.5rem;
-    background: var(--bg-light);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
-  
+
   .stat-item {
-    flex: 1;
-    text-align: center;
     padding: 1rem;
-    background: var(--bg-white);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
   }
-  
+
   .stat-value {
-    display: block;
     font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    line-height: 1.2;
   }
-  
-  .stat-label {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+
+  .section-block {
+    padding: 1rem;
   }
-  
-  /* Empty State */
-  .no-tables {
+
+  .qr-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .qr-card {
+    padding: 1rem;
+  }
+
+  .qr-code-container canvas {
+    width: 150px !important;
+    height: 150px !important;
+  }
+
+  .table-number {
+    font-size: 1.1rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .qr-link {
+    font-size: 0.75rem;
+    padding: 0.6rem;
+  }
+
+  .toast-message {
+    width: 90%;
     text-align: center;
-    padding: 4rem 2rem;
-    background: var(--bg-white);
-    border-radius: var(--radius-lg);
-    border: 2px dashed var(--border-color);
-    margin: 2rem 0;
+    font-size: 0.9rem;
+    padding: 0.8rem 1rem;
   }
-  
-  .no-tables svg {
-    color: var(--primary-light);
-    margin-bottom: 1rem;
-    width: 64px;
-    height: 64px;
-    opacity: 0.7;
+}
+
+@media (max-width: 480px) {
+  .qr-header h2 {
+    font-size: 1.5rem;
   }
-  
+
+  .hotel-info-badge {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .qr-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qr-code-container canvas {
+    width: 180px !important;
+    height: 180px !important;
+  }
+
+  .no-tables {
+    padding: 2rem 1rem;
+    margin: 2rem 1rem;
+  }
+
+  .no-tables div {
+    font-size: 3rem;
+  }
+
   .no-tables h3 {
     font-size: 1.5rem;
-    color: var(--primary-dark);
-    margin-bottom: 0.5rem;
   }
-  
+
   .no-tables p {
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-  }
-  
-  .no-tables button {
-    padding: 0.75rem 2rem;
-    background: var(--primary-color);
-    color: var(--text-white);
-    border: none;
-    border-radius: var(--radius-md);
     font-size: 1rem;
-    cursor: pointer;
-    transition: var(--transition);
   }
-  
-  .no-tables button:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+
+  .no-tables button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
   }
-  
-  /* Loading State */
-  .qr-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-    font-size: 1.125rem;
-    color: var(--primary-dark);
+}
+
+/* Print Styles */
+@media print {
+  .generate-qr-container {
+    background: white;
+    padding: 1rem;
   }
-  
-  .qr-loading::after {
-    content: '';
-    width: 20px;
-    height: 20px;
-    margin-left: 10px;
-    border: 2px solid var(--primary-light);
-    border-top-color: var(--primary-dark);
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
+
+  .back-btn,
+  .download-btn,
+  .qr-link,
+  .qr-stats,
+  .hotel-info-badge {
+    display: none;
   }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  
-  /* Toast Notification */
-  .toast-message {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background: var(--success-color);
-    color: var(--text-white);
-    padding: 1rem 2rem;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    animation: slideIn 0.3s ease;
-    z-index: 1000;
-  }
-  
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 1024px) {
-    .generate-qr-container {
-      margin: 1.5rem;
-      padding: 1.5rem;
-    }
-  
-    .qr-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-  
-    .qr-stats {
-      flex-direction: column;
-      gap: 1rem;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .generate-qr-container {
-      margin: 1rem;
-      padding: 1rem;
-    }
-  
-    .qr-header {
-      flex-direction: column;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-  
-    .qr-header h2 {
-      font-size: 1.5rem;
-    }
-  
-    .back-btn {
-      width: 100%;
-      justify-content: center;
-    }
-  
-    .qr-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-  
-    .qr-card {
-      max-width: 400px;
-      margin: 0 auto;
-      width: 100%;
-    }
-  
-    .stat-item {
-      padding: 0.75rem;
-    }
-  
-    .stat-value {
-      font-size: 1.5rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .generate-qr-container {
-      margin: 0.5rem;
-      padding: 1rem;
-    }
-  
-    .qr-header h2 {
-      font-size: 1.25rem;
-    }
-  
-    .hotel-info-badge {
-      font-size: 0.85rem;
-      padding: 0.4rem 1rem;
-    }
-  
-    .qr-card {
-      padding: 1rem;
-    }
-  
-    .table-number {
-      font-size: 1.25rem;
-    }
-  
-    .qr-code-container canvas {
-      width: 150px !important;
-      height: 150px !important;
-    }
-  
-    .qr-link {
-      font-size: 0.7rem;
-    }
-  
-    .download-btn,
-    .print-all-btn {
-      padding: 0.6rem 1rem;
-      font-size: 0.85rem;
-    }
-  
-    .toast-message {
-      left: 1rem;
-      right: 1rem;
-      bottom: 1rem;
-      text-align: center;
-    }
-  }
-  
-  /* Print Styles */
-  @media print {
-    .back-btn,
-    .download-btn,
-    .print-all-btn,
-    .qr-link,
-    .hotel-info-badge {
-      display: none !important;
-    }
-  
-    .generate-qr-container {
-      margin: 0;
-      padding: 1rem;
-      box-shadow: none;
-    }
-  
-    .qr-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-  
-    .qr-card {
-      break-inside: avoid;
-      border: 2px solid #000;
-      box-shadow: none;
-    }
-  
-    .qr-card::before {
-      display: none;
-    }
-  }
-  
-  /* Animation for new QR cards */
-  @keyframes cardAppear {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
+
   .qr-card {
-    animation: cardAppear 0.5s ease;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ccc;
+    box-shadow: none;
   }
-  
-  /* Hover effect for QR code */
-  .qr-code-container {
-    transition: transform 0.3s ease;
+
+  .qr-code-container canvas {
+    max-width: 150px;
   }
-  
-  .qr-card:hover .qr-code-container {
-    transform: scale(1.05);
+}
+
+/* Loading Animation for QR Generation */
+@keyframes qrPulse {
+  0% {
+    opacity: 1;
   }
-  
-  /* Selection styles */
-  .qr-link::selection {
-    background: var(--primary-light);
-    color: var(--primary-dark);
+  50% {
+    opacity: 0.7;
   }
+  100% {
+    opacity: 1;
+  }
+}
+
+.qr-code-container canvas {
+  animation: qrPulse 2s infinite;
+}
+
+/* Custom Focus States */
+button:focus-visible,
+.qr-link:focus-visible {
+  outline: 3px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
+/* Hover Effects for Interactive Elements */
+.qr-link.copied {
+  background: var(--success-color);
+  color: var(--text-white);
+  border-color: var(--success-color);
+}
+
+/* Additional Polish */
+.generate-qr-container {
+  position: relative;
+}
+
+/* Section Divider Animation */
+.section-block {
+  position: relative;
+}
+
+.section-block::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+  opacity: 0.5;
+}

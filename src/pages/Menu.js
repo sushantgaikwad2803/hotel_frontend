@@ -31,6 +31,7 @@ function MenuPage() {
   const [activeOrders, setActiveOrders] = useState([]);
   const [orderMessage, setOrderMessage] = useState("");
   const [orderTime, setOrderTime] = useState(null);
+  const [description, setDescription] = useState("");
 
   /* ================= LOAD HOTEL + FOOD ================= */
   useEffect(() => {
@@ -68,7 +69,7 @@ function MenuPage() {
 
         const tableBookings = data.data.filter(
           b =>
-            Number(b.tableNumber) === Number(tableNumber) &&
+            b.tableNumber === tableNumber &&
             b.status === "active"
         );
 
@@ -127,6 +128,14 @@ function MenuPage() {
       );
   }, [foods, searchTerm, selectedVegType]);
 
+
+  const showVegFilter = useMemo(() => {
+    const hasVeg = foods.some(f => f.category === "veg");
+    const hasNonVeg = foods.some(f => f.category === "non-veg");
+
+    return hasVeg && hasNonVeg;
+  }, [foods]);
+
   /* ================= SPECIAL SECTIONS ================= */
 
   const starterFoods = useMemo(() => {
@@ -157,13 +166,13 @@ function MenuPage() {
       rice: "Rice",
       drinks: "Drinks",
     };
-  
+
     const availableCategories = Array.from(
       new Set(
         rotiRiceDrinksFoods.map(f => f.foodCategory?.toLowerCase())
       )
     );
-  
+
     return availableCategories
       .map(cat => categoryMap[cat])
       .filter(Boolean)
@@ -229,7 +238,7 @@ function MenuPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           hotelId,
-          tableNumber: Number(tableNumber),
+          tableNumber: tableNumber,
           items: cart.map(i => ({
             foodId: i._id,
             title: i.title,
@@ -378,28 +387,30 @@ function MenuPage() {
         />
       </div>
 
-      <div className="veg-filter">
-        <button
-          className={selectedVegType === "all" ? "active" : ""}
-          onClick={() => setSelectedVegType("all")}
-        >
-          All
-        </button>
+      {showVegFilter && (
+        <div className="veg-filter">
+          <button
+            className={selectedVegType === "all" ? "active" : ""}
+            onClick={() => setSelectedVegType("all")}
+          >
+            All
+          </button>
 
-        <button
-          className={selectedVegType === "veg" ? "active" : ""}
-          onClick={() => setSelectedVegType("veg")}
-        >
-          Veg
-        </button>
+          <button
+            className={selectedVegType === "veg" ? "active" : ""}
+            onClick={() => setSelectedVegType("veg")}
+          >
+            Veg
+          </button>
 
-        <button
-          className={selectedVegType === "non-veg" ? "active" : ""}
-          onClick={() => setSelectedVegType("non-veg")}
-        >
-          Non-Veg
-        </button>
-      </div>
+          <button
+            className={selectedVegType === "non-veg" ? "active" : ""}
+            onClick={() => setSelectedVegType("non-veg")}
+          >
+            Non-Veg
+          </button>
+        </div>
+      )}
 
       {/* STARTER */}
       {starterFoods.length > 0 && (
@@ -422,7 +433,7 @@ function MenuPage() {
       )}
 
       {/* ALL FOODS */}
-      <h2 className="section-title">All Items</h2>
+      <h2 className="section-title" id="color">All Items</h2>
       <div className="food-grid">
         {mainCourseFoods.map(renderFoodCard)}
       </div>
@@ -462,17 +473,17 @@ function MenuPage() {
             <label>Spice Level</label>
             <select
             >
-              <option value="veg">Low</option>
-              <option value="non-veg">Meadim</option>
-              <option value="non-veg">Large</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
             </select>
           </div>
           <div className="form-group">
             <label>Description</label>
             <input
               type="text"
-              valu
-              required
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Description"
             />
           </div>
@@ -501,7 +512,9 @@ function MenuPage() {
             <p>No orders yet</p>
           ) : (
             activeOrders.map(order => {
-              const orderedTime = new Date(order.orderedAt).getTime();
+              const orderedTime = order.orderedAt
+                ? new Date(order.orderedAt).getTime()
+                : Date.now();
               const now = Date.now();
 
               const cancelDuration = 5 * 60 * 1000; // 5 minutes in ms

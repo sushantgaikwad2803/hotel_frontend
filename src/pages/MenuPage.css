@@ -159,12 +159,14 @@ body {
   margin: 30px 0 15px;
   font-size: 22px;
   font-weight: 700;
-  color: var(--gray-dark);
   position: relative;
   padding-left: 15px;
   text-align: left;
-  background: var(--gray-light);
   z-index: 3;
+}
+
+#color {
+  background-color:#fef9f4;
 }
 
 .section-title::before {
