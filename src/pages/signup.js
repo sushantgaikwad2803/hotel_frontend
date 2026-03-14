@@ -284,7 +284,7 @@ function Signup() {
 
           <form onSubmit={handleSubmit} className="signup-form">
             {/* Hotel Name Field */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="hotelName">
                 <Building size={18} />
                 <span>Hotel Name</span>
@@ -302,7 +302,7 @@ function Signup() {
             </div>
 
             {/* Email Field */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="email">
                 <Mail size={18} />
                 <span>Email</span>
@@ -320,7 +320,7 @@ function Signup() {
             </div>
 
             {/* Password Field */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="password">
                 <Lock size={18} />
                 <span>Password</span>
@@ -347,7 +347,7 @@ function Signup() {
             </div>
 
             {/* Confirm Password Field */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="confirmPassword">
                 <Lock size={18} />
                 <span>Confirm Password</span>
@@ -375,7 +375,7 @@ function Signup() {
 
 
             {/* Hotel Type */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="hotelType">
                 <Hotel size={18} />
                 <span>Hotel Type</span>
@@ -399,7 +399,7 @@ function Signup() {
             </div>
 
             {/* Table Count Field */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label>
                 <Users size={18} />
                 <span>Hotel Sections</span>
@@ -447,7 +447,7 @@ function Signup() {
             </div>
 
             {/* Address Field */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="address">
                 <MapPin size={18} />
                 <span>Address</span>
@@ -466,7 +466,7 @@ function Signup() {
 
             {/* City and State Row */}
             <div className="row-inputs">
-              <div className="input-group half">
+              <div className="input-groupE half">
                 <label htmlFor="city">
                   <Globe size={18} />
                   <span>City</span>
@@ -483,7 +483,7 @@ function Signup() {
                 {errors.city && <span className="error-message">{errors.city}</span>}
               </div>
 
-              <div className="input-group half">
+              <div className="input-groupE half">
                 <label htmlFor="state">
                   <Globe size={18} />
                   <span>State</span>

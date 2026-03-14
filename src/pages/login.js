@@ -129,7 +129,7 @@ function Login() {
           <form onSubmit={handleSubmit} className="login-form">
 
             {/* EMAIL */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="email">
                 <Mail size={18} />
                 <span>Email</span>
@@ -150,7 +150,7 @@ function Login() {
             </div>
 
             {/* PASSWORD */}
-            <div className="input-group">
+            <div className="input-groupE">
               <label htmlFor="password">
                 <Lock size={18} />
                 <span>Password</span>

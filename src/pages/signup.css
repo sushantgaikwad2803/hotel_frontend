@@ -85,8 +85,6 @@ html, body {
   animation: fadeInUp 0.8s ease;
   max-height: 90vh;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary-tomato) #f0f0f0;
 }
 
 .signup-card::-webkit-scrollbar {

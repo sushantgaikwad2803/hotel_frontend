@@ -7,6 +7,7 @@ import Home from './pages/admin';
 import Menu from './pages/Menu';
 import GenerateQR from "./pages/GenerateQR";
 import Booking from "./pages/BookingsPage";
+import KOTPage from "./pages/KOT";
 
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/generate-qr" element={<GenerateQR />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/kot/:hotelId/:tableNumber" element={<KOTPage />} />
       </Routes>
     </div>
   );

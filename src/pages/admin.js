@@ -408,6 +408,13 @@ function AdminDashboard() {
         </button>
 
         <button
+          className="booking-page-btn"
+          onClick={() => navigate(`/kot/${hotel._id}/all`)}
+        >
+          KOT
+        </button>
+
+        <button
           className="generate-qr-btn"
           onClick={() => navigate("/generate-qr")}
         >
