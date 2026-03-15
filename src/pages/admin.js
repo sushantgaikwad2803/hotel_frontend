@@ -725,6 +725,7 @@ function AdminDashboard() {
                     <option value="roti">Roti</option>
                     <option value="starter">Starter</option>
                     <option value="drinks">Drinks</option>
+                    <option value="drinks">Drinks</option>
                   </select>
                 </div>
               </div>

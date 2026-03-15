@@ -32,7 +32,6 @@ function MenuPage() {
   const [orderMessage, setOrderMessage] = useState("");
   const [orderTime, setOrderTime] = useState(null);
   const [description, setDescription] = useState("");
-  const [spiceLevel, setSpiceLevel] = useState("medium");
 
   /* ================= LOAD HOTEL + FOOD ================= */
   useEffect(() => {
@@ -63,13 +62,16 @@ function MenuPage() {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const res = await fetch(
-          `${API}/api/bookings/table/${hotelId}/${tableNumber}`
-        );
+        const res = await fetch(`${API}/api/bookings/${hotelId}`);
         const data = await res.json();
 
         if (!data.success) return;
-        const tableBookings = data.data;
+
+        const tableBookings = data.data.filter(
+          b =>
+            b.tableNumber === tableNumber &&
+            b.status === "active"
+        );
 
         const merged = [];
 
@@ -94,7 +96,7 @@ function MenuPage() {
     };
 
     loadOrders();
-    const interval = setInterval(loadOrders, 5000);
+    const interval = setInterval(loadOrders, 3000);
     return () => clearInterval(interval);
   }, [hotelId, tableNumber]);
 
@@ -241,9 +243,7 @@ function MenuPage() {
             foodId: i._id,
             title: i.title,
             price: i.price,
-            quantity: i.quantity,
-            spiceLevel: spiceLevel,
-            instructions: description
+            quantity: i.quantity
           }))
         })
       });
@@ -273,7 +273,7 @@ function MenuPage() {
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ foodId })
+          body: JSON.stringify({ foodId }),
         }
       );
 
@@ -472,9 +472,7 @@ function MenuPage() {
           <div className="form-group">
             <label>Spice Level</label>
             <select
-  value={spiceLevel}
-  onChange={(e) => setSpiceLevel(e.target.value)}
->
+            >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
@@ -535,7 +533,7 @@ function MenuPage() {
                     .padStart(2, "0")}`
                   : "00:00";
               return (
-                <div key={order.bookingId + order.foodId} className="order-card">
+                <div key={order.foodId} className="order-card">
 
                   <div className="order-row">
                     <div>
