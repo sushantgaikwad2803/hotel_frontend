@@ -88,6 +88,7 @@ function BookingsPage() {
       body: JSON.stringify({
         hotelId: hotel._id,
         tableNumber: openTable,
+        orderType: "table",
         items: cartItems
       })
 
@@ -112,7 +113,7 @@ function BookingsPage() {
     try {
 
       const res = await fetch(
-        `${API}/api/bookings/hotel/${hotel._id}`
+        `${API}/api/bookings/hotel/${hotel._id}?type=table`
       );
       const data = await res.json();
 
@@ -176,20 +177,20 @@ function BookingsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderItemId })
     });
-  
+
     const data = await res.json();
-  
+
     if (data.success) {
       fetchBookings();
     }
-  
+
   };
 
   const sendToKitchen = async () => {
 
     const tableBookings = bookings.filter(
       b =>
-        b.tableNumber === openTable &&
+        b.number === openTable &&
         b.status === "active"
     );
 
@@ -248,7 +249,7 @@ function BookingsPage() {
   const completeTableOrders = () => {
 
     const tableBookings = bookings.filter(
-      b => b.tableNumber === openTable && b.status === "active"
+      b => b.number === openTable && b.status === "active"
     );
 
     if (tableBookings.length === 0) return;
@@ -281,86 +282,82 @@ function BookingsPage() {
 
   const printBillAndComplete = async () => {
 
-    const res = await fetch(`${API}/api/orders/complete-table`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        hotelId: hotel._id,
-        tableNumber: openTable,
-        paymentMethod: selectedPayment
-      })
-    });
+    try {
 
-    const data = await res.json();
+      const res = await fetch(`${API}/api/orders/complete-table`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hotelId: hotel._id,
+          tableNumber: openTable,
+          paymentMethod: selectedPayment
+        })
+      });
 
-    if (data.success) {
+      const data = await res.json();
 
-      generateBill(data.order);
+      if (!data.success) {
+        alert("Failed to complete order");
+        return;
+      }
 
+      const order = data.order;
+
+      const tableNumber = data.tableNumber;
+
+      generateBill(order, tableNumber);
+
+      // refresh UI
       fetchBookings();
-
       setShowBillPopup(false);
       setOpenTable(null);
 
+    } catch (err) {
+      console.error(err);
+      alert("Server Error");
     }
 
   };
 
-  const generateBill = (order) => {
+  const generateBill = (order, tableNumber) => {
 
     const items = order.items;
-    const billNo = order.billNo;
-
-
+  
     let subtotal = 0;
-
+  
     items.forEach(item => {
       subtotal += item.price * item.quantity;
     });
-
+  
     const gst = Number((subtotal * 0.05).toFixed(2));
     const total = Number((subtotal + gst).toFixed(2));
-
-
+  
     const billHTML = `
     <html>
     <head>
-    <title>Restaurant Bill</title>
     <style>
-    body{
-      font-family: monospace;
-      width:300px;
-      margin:auto;
-    }
-    h2,h3{
-      text-align:center;
-    }
-    table{
-      width:100%;
-      border-collapse:collapse;
-    }
-    td,th{
-      padding:4px;
-      border-bottom:1px dashed #000;
-    }
+    body{font-family:monospace;width:300px;margin:auto;}
+    h2,h3{text-align:center;}
+    table{width:100%;border-collapse:collapse;}
+    td,th{padding:4px;border-bottom:1px dashed #000;}
     </style>
     </head>
   
     <body>
   
     <h2>${hotel.hotelName}</h2>
-    <h3>${hotel.address || ""}</h3>
   
-    <p>Bill No: ${billNo}</p>
-    <p>Table: ${openTable}</p>
-    <p>Date: ${new Date(order.createdAt).toLocaleString()}</p>
+    <p>Bill No: ${order.billNo}</p>
+    <p>Table: ${tableNumber}</p>
+    <p>Date: ${new Date().toLocaleString()}</p>
     <p>Payment: ${order.paymentMethod}</p>
   
     <table>
+  
     <tr>
     <th>Item</th>
     <th>Qty</th>
-    <th>Price</th>
+    <th>Total</th>
     </tr>
   
     ${items.map(item => `
@@ -375,21 +372,24 @@ function BookingsPage() {
   
     <hr>
   
-    <p>Subtotal : ₹${subtotal.toFixed(2)}</p>
-    <p>GST (5%) : ₹${gst.toFixed(2)}</p>
+    <p>Subtotal : ₹${subtotal}</p>
+    <p>GST : ₹${gst}</p>
   
-    <h3>Total : ₹${total.toFixed(2)}</h3>
-  
-    <p style="text-align:center">Thank You Visit Again</p>
+    <h3>Total : ₹${total}</h3>
   
     </body>
     </html>
     `;
-
+  
     const win = window.open("", "", "width=350,height=600");
+  
     win.document.write(billHTML);
     win.document.close();
-    win.print();
+  
+    setTimeout(() => {
+      win.focus();
+      win.print();
+    }, 300);
   };
 
   const updateBookingState = (bookingId, updatedBooking) => {
@@ -413,11 +413,11 @@ function BookingsPage() {
         .sort((a, b) => {
 
           const aHasOrder = bookings.some(
-            bk => bk.tableNumber.split("-T")[0] === a.sectionName && !bk.kotSent
+            bk => bk.number && bk.number.split("-T")[0] === a.sectionName && !bk.kotSent
           );
 
           const bHasOrder = bookings.some(
-            bk => bk.tableNumber.split("-T")[0] === b.sectionName && !bk.kotSent
+            bk => bk.number && bk.number.split("-T")[0] === b.sectionName && !bk.kotSent
           );
 
           if (aHasOrder && !bHasOrder) return -1;
@@ -467,7 +467,7 @@ function BookingsPage() {
 
                   const tableBookings = bookings.filter(
                     b =>
-                      b.tableNumber === tableNumber &&
+                      b.number === tableNumber &&
                       b.status === "active"
                   );
 
@@ -710,7 +710,7 @@ function BookingsPage() {
             {bookings
               .filter(
                 b =>
-                  b.tableNumber === openTable &&
+                  b.number === openTable &&
                   b.status === "active"
               )
               .map((booking) =>

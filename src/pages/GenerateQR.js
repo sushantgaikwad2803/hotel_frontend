@@ -26,7 +26,11 @@ function GenerateQR() {
 
   if (!savedUser) return null;
 
-  const { _id, sections = [], hotelName } = savedUser;
+  const { _id, sections = [], hotelName, roomCount = 0 } = savedUser;
+
+  const rooms = Array.from({ length: Number(roomCount) || 0 }, (_, i) => ({
+    roomNumber: `R${i + 1}`
+  }));
 
   // ✅ Generate tables using sections
   const tables = sections.flatMap(section =>
@@ -82,10 +86,10 @@ function GenerateQR() {
       </div>
 
       <div className="hotel-info-badge">
-        <strong>{hotelName}</strong> • {totalTables} Tables
+        <strong>{hotelName}</strong> • {totalTables} Tables • {rooms.length} Rooms
       </div>
 
-      {totalTables > 0 ? (
+      {totalTables > 0 || rooms.length > 0 ? (
 
         <>
 
@@ -178,6 +182,87 @@ function GenerateQR() {
             );
 
           })}
+
+          {rooms.length > 0 && (
+
+            <div className="section-block">
+
+              <h3 className="section-title">Rooms</h3>
+
+              <div className="qr-grid">
+
+                {rooms.map((room, index) => {
+
+                  const qrValue =
+                    `${FRONTEND_URL}/menu/${_id}/${room.roomNumber}`;
+
+                  return (
+
+                    <div key={room.roomNumber} className="qr-card">
+
+                      <div className="table-number">
+                        {room.roomNumber}
+                        <span>QR</span>
+                      </div>
+
+                      <div className="qr-code-container">
+
+                        <QRCodeCanvas
+                          id={`qr-room-${room.roomNumber}`}
+                          value={qrValue}
+                          size={200}
+                          level="H"
+                          includeMargin={true}
+                        />
+
+                      </div>
+
+                      <div
+                        className="qr-link"
+                        onClick={() =>
+                          handleCopyLink(qrValue, `room-${index}`)
+                        }
+                      >
+                        {copiedIndex === `room-${index}`
+                          ? "✓ Copied!"
+                          : qrValue}
+                      </div>
+
+                      <button
+                        className="download-btn"
+                        onClick={() => {
+
+                          const canvas = document.getElementById(
+                            `qr-room-${room.roomNumber}`
+                          );
+
+                          const url = canvas.toDataURL("image/png");
+
+                          const link = document.createElement("a");
+
+                          link.download =
+                            `${hotelName}-Room-${room.roomNumber}-QR.png`;
+
+                          link.href = url;
+
+                          link.click();
+
+                        }}
+                      >
+                        Download QR
+                      </button>
+
+                    </div>
+
+                  );
+
+                })}
+
+              </div>
+
+            </div>
+
+          )}
 
         </>
 

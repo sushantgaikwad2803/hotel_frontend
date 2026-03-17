@@ -404,7 +404,14 @@ function AdminDashboard() {
           className="booking-page-btn"
           onClick={() => navigate("/booking")}
         >
-          View Booked Tables
+          Manage Tables
+        </button>
+
+        <button
+          className="booking-page-btn"
+          onClick={() => navigate("/rooms")}
+        >
+          Manage Rooms
         </button>
 
         <button

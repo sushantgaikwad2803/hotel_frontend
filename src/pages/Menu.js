@@ -15,6 +15,7 @@ const API = process.env.REACT_APP_API;
 
 function MenuPage() {
   const { hotelId, tableNumber } = useParams();
+  const isRoom = /^R\d+/i.test(tableNumber);
 
   const [hotel, setHotel] = useState(null);
   const [foods, setFoods] = useState([]);
@@ -239,6 +240,7 @@ function MenuPage() {
         body: JSON.stringify({
           hotelId,
           tableNumber: tableNumber,
+          orderType: isRoom ? "room" : "table",
           items: cart.map(i => ({
             foodId: i._id,
             title: i.title,
@@ -375,7 +377,7 @@ function MenuPage() {
       <div className="hotel-header">
         <h1>{hotel.hotelName}</h1>
         <p><MapPin size={14} /> {hotel.city}, {hotel.state}</p>
-        <p>Table {tableNumber}</p>
+        <p>{isRoom ? "Room" : "Table"} {tableNumber}</p>
       </div>
 
       <div className="search-container">

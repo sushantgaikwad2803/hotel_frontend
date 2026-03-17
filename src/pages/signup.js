@@ -17,6 +17,8 @@ function Signup() {
     city: '',
     state: '',
     hotelType: '',
+    roomCount: '',
+    orderCount: '',
     sections: [
       { sectionName: '', tableCount: 0 }
     ],
@@ -168,6 +170,16 @@ function Signup() {
       newErrors.email = 'Email is invalid';
     }
 
+    if (formData.hotelType === "hotel_with_lodging") {
+      if (!formData.roomCount || formData.roomCount < 1) {
+        newErrors.roomCount = "Room count must be at least 1";
+      }
+    }
+
+    if (formData.orderCount && formData.orderCount < 0) {
+      newErrors.orderCount = "Order count cannot be negative";
+    }
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
@@ -237,6 +249,15 @@ function Signup() {
       data.append('state', formData.state);
       data.append('hotelType', formData.hotelType);
       data.append('sections', JSON.stringify(formData.sections));
+
+
+      if (formData.hotelType === "hotel_with_lodging") {
+        data.append("roomCount", formData.roomCount);
+      }
+
+      if (formData.orderCount) {
+        data.append("orderCount", formData.orderCount);
+      }
 
       if (formData.hotelImage) {
         data.append('hotelImage', formData.hotelImage);
@@ -395,6 +416,52 @@ function Signup() {
 
               {errors.hotelType && (
                 <span className="error-message">{errors.hotelType}</span>
+              )}
+            </div>
+
+            {formData.hotelType === "hotel_with_lodging" && (
+              <div className="input-groupE">
+                <label htmlFor="roomCount">
+                  <Building size={18} />
+                  <span>Room Count</span>
+                </label>
+
+                <input
+                  type="number"
+                  id="roomCount"
+                  name="roomCount"
+                  min="1"
+                  value={formData.roomCount}
+                  onChange={handleChange}
+                  placeholder="Enter total rooms"
+                  className={errors.roomCount ? "error" : ""}
+                />
+
+                {errors.roomCount && (
+                  <span className="error-message">{errors.roomCount}</span>
+                )}
+              </div>
+            )}
+
+            <div className="input-groupE">
+              <label htmlFor="orderCount">
+                <Users size={18} />
+                <span>Order Count</span>
+              </label>
+
+              <input
+                type="number"
+                id="orderCount"
+                name="orderCount"
+                min="0"
+                value={formData.orderCount}
+                onChange={handleChange}
+                placeholder="Enter starting order count"
+                className={errors.orderCount ? "error" : ""}
+              />
+
+              {errors.orderCount && (
+                <span className="error-message">{errors.orderCount}</span>
               )}
             </div>
 
