@@ -407,12 +407,14 @@ function AdminDashboard() {
           Manage Tables
         </button>
 
-        <button
-          className="booking-page-btn"
-          onClick={() => navigate("/rooms")}
-        >
-          Manage Rooms
-        </button>
+        {hotel.hotelType === "hotel_with_lodging" && (
+          <button
+            className="booking-page-btn"
+            onClick={() => navigate("/rooms")}
+          >
+            Manage Rooms
+          </button>
+        )}
 
         <button
           className="booking-page-btn"

@@ -111,44 +111,10 @@ function RoomsPage() {
 
     /* ================= FOOD SEARCH ================= */
 
-    const filteredFoods = foods.filter(food =>
-        food.title.toLowerCase().includes(searchFood.toLowerCase())
-    );
-
-
-    // const completeRoomOrders = () => {
-
-    //     const roomBookings = roomOrders.filter(
-    //         r => r.number === openRoom && r.status === "active"
-    //     );
-
-    //     if (roomBookings.length === 0) return;
-
-    //     const items = [];
-
-    //     roomBookings.forEach(booking => {
-    //         booking.orders.forEach(item => {
-    //             items.push(item);
-    //         });
-    //     });
-
-    //     const subtotal = items.reduce(
-    //         (sum, i) => sum + (i.price * i.quantity),
-    //         0
-    //     );
-
-    //     const gst = Number((subtotal * 0.05).toFixed(2));
-    //     const total = Number((subtotal + gst).toFixed(2));
-
-    //     setBillData({
-    //         items,
-    //         subtotal,
-    //         gst,
-    //         total
-    //     });
-
-    //     setShowBillPopup(true);
-    // };
+    const filteredFoods = foods.filter(food => {
+        const search = searchFood.trim().toLowerCase();
+        return food.title.toLowerCase().startsWith(search);
+    });
 
     const generateBill = (bill) => {
 
@@ -576,6 +542,29 @@ function RoomsPage() {
                     >
 
                         <h2>Room {openRoom}</h2>
+
+                        {(() => {
+                            const roomData = roomOrders.find(
+                                r => r.number === openRoom && r.status === "active"
+                            );
+
+                            if (!roomData) return null;
+
+                            return (
+                                <div className="room-info">
+                                    <p><strong>Customer:</strong> {roomData.customerName || "N/A"}</p>
+                                    <p><strong>Age:</strong> {roomData.age || "N/A"}</p>
+                                    <p><strong>Persons:</strong> {roomData.personCount || "N/A"}</p>
+                                    <p>
+                                        <strong>Check-In:</strong>{" "}
+                                        {roomData.checkInTime
+                                            ? new Date(roomData.checkInTime).toLocaleString()
+                                            : "N/A"}
+                                    </p>
+                                    <hr />
+                                </div>
+                            );
+                        })()}
 
                         {roomOrders
                             .filter(

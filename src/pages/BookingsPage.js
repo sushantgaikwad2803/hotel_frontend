@@ -25,6 +25,10 @@ function BookingsPage() {
   const [showBillPopup, setShowBillPopup] = useState(false);
   const [billData, setBillData] = useState(null);
 
+  const [showRoomShift, setShowRoomShift] = useState(false);
+const [selectedRoom, setSelectedRoom] = useState("");
+const [rooms, setRooms] = useState([]);
+
   useEffect(() => {
 
     const storedHotel = localStorage.getItem("hotelUser");
@@ -54,9 +58,27 @@ function BookingsPage() {
 
   }, [hotel]);
 
-  const filteredFoods = foods.filter(food =>
-    food.title.toLowerCase().includes(searchFood.toLowerCase())
-  );
+  useEffect(() => {
+    if (!hotel?._id) return;
+  
+    fetch(`${API}/api/bookings/hotel/${hotel._id}?type=room`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // ✅ ONLY LOGGED-IN ROOMS
+          const activeRooms = data.data.filter(
+            r => r.status === "active" && r.checkInTime
+          );
+  
+          setRooms(activeRooms);
+        }
+      });
+  }, [hotel]);
+
+  const filteredFoods = foods.filter(food => {
+    const search = searchFood.trim().toLowerCase();
+    return food.title.toLowerCase().startsWith(search);
+});
 
   const addToCart = () => {
 
@@ -246,6 +268,47 @@ function BookingsPage() {
     }
 
   };
+
+  const shiftToRoom = async () => {
+
+    if (!selectedRoom) {
+      alert("Select room first");
+      return;
+    }
+  
+    try {
+  
+      const res = await fetch(`${API}/api/bookings/shift-to-room`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hotelId: hotel._id,
+          tableNumber: openTable,
+          roomNumber: selectedRoom
+        })
+      });
+  
+      const data = await res.json();
+  
+      if (data.success) {
+        alert("Shifted to Room Successfully");
+  
+        fetchBookings();
+  
+        setShowRoomShift(false);
+        setSelectedRoom("");
+        setOpenTable(null);
+  
+      } else {
+        alert(data.message || "Shift failed");
+      }
+  
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  };
+
   const completeTableOrders = () => {
 
     const tableBookings = bookings.filter(
@@ -596,6 +659,33 @@ function BookingsPage() {
 
       )}
 
+{showRoomShift && (
+  <div className="manual-popup">
+    <h3>Shift Table {openTable} → Room</h3>
+
+    <select
+      value={selectedRoom}
+      onChange={(e) => setSelectedRoom(e.target.value)}
+    >
+      <option value="">Select Room</option>
+
+      {rooms.map((r, i) => (
+        <option key={i} value={r.number}>
+          {r.number} ({r.customerName})
+        </option>
+      ))}
+    </select>
+
+    <button onClick={shiftToRoom}>
+      Shift
+    </button>
+
+    <button onClick={() => setShowRoomShift(false)}>
+      Cancel
+    </button>
+  </div>
+)}
+
       {showShiftPopup && (
 
         <div className="manual-popup">
@@ -802,6 +892,13 @@ function BookingsPage() {
               >
                 🔄 Shift Table
               </button>
+
+              <button
+  className="back-btn"
+  onClick={() => setShowRoomShift(true)}
+>
+  🏨 Shift To Room
+</button>
 
             </div>
 

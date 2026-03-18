@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ShoppingCart,
   MapPin,
@@ -33,8 +33,11 @@ function MenuPage() {
   const [orderMessage, setOrderMessage] = useState("");
   const [orderTime, setOrderTime] = useState(null);
   const [description, setDescription] = useState("");
+  const [spiceLevel, setSpiceLevel] = useState("medium");
+  const [, setPlacing] = useState(false);
 
   /* ================= LOAD HOTEL + FOOD ================= */
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -46,7 +49,7 @@ function MenuPage() {
 
         const foodRes = await fetch(`${API}/api/food/hotel/${hotelId}`);
         const foodData = await foodRes.json();
-        if (foodData.success && Array.isArray(foodData.data)) {
+        if (foodData.success) {
           setFoods(foodData.data.filter(f => f.available));
         }
       } catch (err) {
@@ -60,60 +63,66 @@ function MenuPage() {
   }, [hotelId]);
 
   /* ================= FETCH ORDERS ================= */
-  useEffect(() => {
-    const loadOrders = async () => {
-      try {
-        const res = await fetch(`${API}/api/bookings/${hotelId}`);
-        const data = await res.json();
+  const loadOrders = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/bookings/${hotelId}`);
+      const data = await res.json();
 
-        if (!data.success) return;
+      if (!data.success) return;
 
-        const tableBookings = data.data.filter(
-          b =>
-            b.tableNumber === tableNumber &&
-            b.status === "active"
+      const tableBookings = data.data.filter(b => {
+        const backendNumber = String(b.number).replace(/[^\d]/g, "");
+        const frontendNumber = String(tableNumber).replace(/[^\d]/g, "");
+
+        return (
+          backendNumber === frontendNumber &&
+          b.orderType === (isRoom ? "room" : "table") &&
+          b.status === "active"
         );
+      });
 
-        const merged = [];
+      const merged = [];
 
-        tableBookings.forEach(b => {
-          b.orders?.forEach(item => {
-            merged.push({
-              bookingId: b._id,
-              foodId: item.foodId,
-              title: item.title,
-              price: item.price,
-              quantity: item.quantity,
-              delivered: item.delivered,
-              orderedAt: item.orderedAt
-            });
+      tableBookings.forEach(b => {
+        b.orders?.forEach(item => {
+          merged.push({
+            bookingId: b._id,
+            foodId: item.foodId,
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity,
+            delivered: item.delivered,
+            orderedAt: item.orderedAt
           });
         });
+      });
 
-        setActiveOrders(merged);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+      setActiveOrders(merged);
 
-    loadOrders();
-    const interval = setInterval(loadOrders, 3000);
-    return () => clearInterval(interval);
-  }, [hotelId, tableNumber]);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [hotelId, tableNumber, isRoom]);
 
   const pendingCount = useMemo(() => {
     return activeOrders.reduce(
-      (sum, o) => sum + (o.pendingQty || o.quantity || 0),
+      (sum, o) => sum + (o.quantity || 0),
       0
     );
   }, [activeOrders]);
 
+
+
+  const [, forceUpdate] = useState(0);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveOrders(prev => [...prev]);
-    }, 1000); // update every 1 second for countdown
-    return () => clearInterval(interval);
+    const timer = setInterval(() => {
+      forceUpdate(n => n + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
+
 
   /* ================= FILTERS ================= */
 
@@ -233,14 +242,17 @@ function MenuPage() {
   const placeOrder = async () => {
     if (!cart.length) return alert("Cart empty");
 
+    setPlacing(true);
+
     try {
       const res = await fetch(`${API}/api/bookings/place-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           hotelId,
-          tableNumber: tableNumber,
+          tableNumber,
           orderType: isRoom ? "room" : "table",
+          description, // ✅ added
           items: cart.map(i => ({
             foodId: i._id,
             title: i.title,
@@ -257,6 +269,8 @@ function MenuPage() {
         setShowCart(false);
         setOrderMessage("Order placed successfully!");
         setOrderTime(new Date());
+
+        loadOrders(); // ✅ instead of reload
       } else {
         setOrderMessage("Failed to place order");
       }
@@ -443,7 +457,7 @@ function MenuPage() {
       {orderMessage && (
         <div className="order-message">{orderMessage}</div>
       )}
- 
+
       {cart.length > 0 && (
         <button
           className="floating-cart"
@@ -456,7 +470,10 @@ function MenuPage() {
 
       <button
         className="floating-orders"
-        onClick={() => setShowOrders(true)}
+        onClick={() => {
+          setShowOrders(true);
+          loadOrders(); // 🔥 force refresh
+        }}
       >
         <ClipboardList size={18} />
         {pendingCount}
@@ -474,6 +491,8 @@ function MenuPage() {
           <div className="form-group">
             <label>Spice Level</label>
             <select
+              value={spiceLevel}
+              onChange={(e) => setSpiceLevel(e.target.value)}
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -535,7 +554,7 @@ function MenuPage() {
                     .padStart(2, "0")}`
                   : "00:00";
               return (
-                <div key={order.foodId} className="order-card">
+                <div key={`${order.bookingId}-${order.foodId}-${order.orderedAt}`} className="order-card">
 
                   <div className="order-row">
                     <div>
