@@ -493,7 +493,7 @@ function RoomsPage() {
 
                     <h3>Room Check In</h3>
 
-                    <input
+                    <input type="text"
                         placeholder="Customer Name"
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
@@ -513,11 +513,11 @@ function RoomsPage() {
                         onChange={(e) => setPersonCount(e.target.value)}
                     />
 
-                    <button onClick={roomLogin}>
+                    <button  className="login-btn" onClick={roomLogin}>
                         Check In
                     </button>
 
-                    <button onClick={() => setShowLoginPopup(false)}>
+                    <button className="login-btn" onClick={() => setShowLoginPopup(false)}>
                         Cancel
                     </button>
 

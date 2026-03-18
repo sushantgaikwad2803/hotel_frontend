@@ -406,7 +406,7 @@ function AdminDashboard() {
         >
           Manage Tables
         </button>
-
+                      
         {hotel.hotelType === "hotel_with_lodging" && (
           <button
             className="booking-page-btn"
